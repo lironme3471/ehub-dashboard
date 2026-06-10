@@ -1,136 +1,279 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>eHub Closed Won Dashboard</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:'Segoe UI',-apple-system,Roboto,Arial,sans-serif;background:#f4f6fa;color:#21212b}
-#gate{position:fixed;inset:0;background:#21212b;display:flex;align-items:center;justify-content:center;z-index:1000}
-#gate .card{background:#fff;padding:40px;border-radius:14px;width:340px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.4)}
-#gate h2{color:#3694FC;margin:0 0 6px}
-#gate p{color:#666;font-size:13px;margin:0 0 20px}
-#gate input{width:100%;padding:11px;border:1px solid #ccc;border-radius:8px;font-size:15px;margin-bottom:12px}
-#gate button{width:100%;padding:11px;background:#3694FC;color:#fff;border:0;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
-#gate .err{color:#FF5B8A;font-size:13px;height:16px;margin-top:8px}
-#app{display:none;padding:22px 28px 60px}
-header h1{margin:0;font-size:22px;color:#21212b}
-.banner{background:#FFF7D6;border:1px solid #F4D35E;color:#7a5d00;padding:10px 14px;border-radius:8px;font-size:13px;margin:14px 0}
-.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0}
-.kpi{background:#fff;border-radius:12px;padding:16px 20px;flex:1;min-width:120px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid #3694FC}
-.kpi .v{font-size:26px;font-weight:700;color:#21212b}
-.kpi .l{font-size:12px;color:#777;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
-.kpi.live{border-color:#34A853} .kpi.del{border-color:#FF5B8A} .kpi.eta{border-color:#6100FF} .kpi.tbd{border-color:#999}
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;align-items:center}
-.filters input,.filters select{padding:9px 11px;border:1px solid #d3d8e0;border-radius:8px;font-size:14px;background:#fff}
-.filters input[type=text]{min-width:240px}
-.count{font-size:13px;color:#666;margin-left:auto}
-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-th,td{padding:9px 12px;text-align:left;font-size:13px;border-bottom:1px solid #eef1f6}
-th{background:#21212b;color:#fff;cursor:pointer;user-select:none;white-space:nowrap;font-weight:600}
-th:hover{background:#33333f}
-tr.grp td{background:#eaf2fe;font-weight:700;color:#21212b;font-size:13px}
-td a{color:#3694FC;text-decoration:none} td a:hover{text-decoration:underline}
-.badge{display:inline-block;padding:2px 9px;border-radius:11px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap}
-.ibadge{display:inline-block;padding:2px 8px;border-radius:11px;color:#fff;font-size:11px;font-weight:600;margin-right:4px}
-.gl-live{background:#34A853} .gl-del{background:#FF5B8A} .gl-eta{background:#6100FF} .gl-tbd{background:#999}
-.acv{font-variant-numeric:tabular-nums;font-weight:600}
-.sortind{font-size:10px;margin-left:3px}
-</style></head>
+:root{--blue:#3694FC;--charcoal:#21212B;--indigo:#6100FF;--teal:#36EAD0;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--charcoal);background:#f4f6fa;}
+a{color:var(--blue);text-decoration:none;}
+a:hover{text-decoration:underline;}
+/* gate */
+#gate{position:fixed;inset:0;background:var(--charcoal);display:flex;align-items:center;justify-content:center;z-index:1000;}
+#gate .card{background:#fff;border-radius:14px;padding:38px 34px;width:340px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.35);}
+#gate h1{color:var(--blue);font-size:20px;margin:0 0 6px;}
+#gate p{color:#666;font-size:13px;margin:0 0 20px;}
+#gate input{width:100%;padding:11px 12px;border:1px solid #ccd2dc;border-radius:8px;font-size:14px;margin-bottom:12px;}
+#gate button{width:100%;padding:11px;background:var(--blue);color:#fff;border:0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
+#gate .err{color:#d8385f;font-size:12px;height:14px;margin-bottom:8px;}
+#app{display:none;max-width:1500px;margin:0 auto;padding:22px 26px 60px;}
+header h1{font-size:22px;margin:0 0 2px;}
+header .sub{color:#6b7280;font-size:13px;margin-bottom:14px;}
+.banner{background:#fff7d6;border:1px solid #f2e0a0;color:#7a5d00;padding:9px 14px;border-radius:8px;font-size:13px;margin-bottom:18px;}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px;}
+.kpi{background:#fff;border-radius:11px;padding:14px 16px;box-shadow:0 1px 3px rgba(20,30,60,.08);}
+.kpi .v{font-size:23px;font-weight:700;color:var(--charcoal);}
+.kpi .l{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#8a93a3;margin-top:3px;}
+.kpi.live .v{color:#1FA65A;} .kpi.delayed .v{color:#d8385f;} .kpi.eta .v{color:var(--blue);} .kpi.tbd .v{color:#8a93a3;}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.filters input,.filters select{padding:9px 11px;border:1px solid #ccd2dc;border-radius:8px;font-size:13px;background:#fff;}
+.filters input{min-width:240px;flex:1;}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:11px;overflow:hidden;box-shadow:0 1px 3px rgba(20,30,60,.08);font-size:13px;}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid #eef1f6;vertical-align:top;}
+th{background:var(--charcoal);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;user-select:none;position:sticky;top:0;}
+th .ar{opacity:.55;font-size:10px;}
+tr.grp td{background:#eef3fb;font-weight:700;color:var(--charcoal);font-size:13px;}
+tr.grp .grpmeta{font-weight:500;color:#6b7280;font-size:12px;margin-left:6px;}
+tr.deal:hover{background:#f8fafd;}
+.num{text-align:right;white-space:nowrap;}
+.nowrap{white-space:nowrap;}
+.cur{color:#9aa3b2;font-size:11px;}
+.muted{color:#c2c8d2;}
+.hub{color:#fff;padding:2px 8px;border-radius:11px;font-size:11px;font-weight:600;white-space:nowrap;}
+.ibadge{color:#fff;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:600;margin-right:4px;display:inline-block;}
+.gl{padding:2px 8px;border-radius:11px;font-size:11px;font-weight:600;white-space:nowrap;}
+.gl-live{background:#e3f6ec;color:#1FA65A;}
+.gl-delayed{background:#fce4ea;color:#d8385f;}
+.gl-eta{background:#e6f0ff;color:#1e6fd6;}
+.gl-tbd{background:#eef1f6;color:#8a93a3;}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
 <body>
-<div id="gate"><div class="card">
-  <h2>eHub Dashboard</h2><p>Enter password to continue</p>
-  <input id="pw" type="password" placeholder="Password" autofocus>
-  <button onclick="checkPw()">Access Dashboard</button>
-  <div class="err" id="pwerr"></div>
-</div></div>
+<div id="gate">
+  <div class="card">
+    <h1>eHub Closed Won</h1>
+    <p>Enter password to view the dashboard</p>
+    <div class="err" id="err"></div>
+    <input id="pw" type="password" placeholder="Password" autofocus>
+    <button id="go">Access Dashboard</button>
+  </div>
+</div>
 
 <div id="app">
-<header><h1>eHub Closed Won Dashboard</h1></header>
-<div class="banner">Dashboard generated on 2026-06-09 — data reflects Salesforce as of that date.</div>
-<div class="kpis">
-  <div class="kpi"><div class="v">42</div><div class="l">Total Deals</div></div>
-  <div class="kpi"><div class="v">$9,497,858</div><div class="l">USD ACV</div></div>
-  <div class="kpi live"><div class="v">18</div><div class="l">Live</div></div>
-  <div class="kpi del"><div class="v">15</div><div class="l">Delayed</div></div>
-  <div class="kpi eta"><div class="v">5</div><div class="l">ETA</div></div>
-  <div class="kpi tbd"><div class="v">4</div><div class="l">TBD</div></div>
-</div>
-<div class="filters">
-  <input type="text" id="search" placeholder="Search account or deal name…" oninput="render()">
-  <select id="fregion" onchange="render()"><option value="">All Regions</option><option>Americas</option><option>EMEA</option><option>International</option></select>
-  <select id="fhub" onchange="render()"><option value="">All Hub Types</option><option>Real-Time</option><option>Offline</option><option>RT + Offline</option></select>
-  <select id="fgl" onchange="render()"><option value="">All Go-Live</option><option>Live</option><option>Delayed</option><option>ETA</option><option>TBD</option></select>
-  <span class="count" id="count"></span>
-</div>
-<table><thead><tr>
-  <th onclick="sortBy('account')">Account<span class="sortind" data-c="account"></span></th>
-  <th onclick="sortBy('name')">Deal Name<span class="sortind" data-c="name"></span></th>
-  <th onclick="sortBy('type')">Type<span class="sortind" data-c="type"></span></th>
-  <th onclick="sortBy('integ')">Integration<span class="sortind" data-c="integ"></span></th>
-  <th onclick="sortBy('hub')">Hub<span class="sortind" data-c="hub"></span></th>
-  <th onclick="sortBy('close')">Close Date<span class="sortind" data-c="close"></span></th>
-  <th onclick="sortBy('acv')">ACV<span class="sortind" data-c="acv"></span></th>
-  <th onclick="sortBy('agents')">Agents<span class="sortind" data-c="agents"></span></th>
-  <th onclick="sortBy('region')">Region<span class="sortind" data-c="region"></span></th>
-  <th onclick="sortBy('golive')">Go-Live<span class="sortind" data-c="golive"></span></th>
-  <th onclick="sortBy('owner')">Owner<span class="sortind" data-c="owner"></span></th>
-</tr></thead><tbody id="tbody"></tbody></table>
+  <header>
+    <h1>eHub Closed Won Deals</h1>
+    <div class="sub">Engagement Hub · Closed Won pipeline from Salesforce</div>
+  </header>
+  <div class="banner">Dashboard generated on 2026-06-10 — data reflects Salesforce as of that date.</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">42</div><div class="l">Total Deals</div></div>
+    <div class="kpi"><div class="v">$9,497,858</div><div class="l">USD ACV</div></div>
+    <div class="kpi live"><div class="v">19</div><div class="l">Live</div></div>
+    <div class="kpi delayed"><div class="v">15</div><div class="l">Delayed</div></div>
+    <div class="kpi eta"><div class="v">4</div><div class="l">ETA</div></div>
+    <div class="kpi tbd"><div class="v">4</div><div class="l">TBD</div></div>
+  </div>
+
+  <div class="filters">
+    <input id="search" placeholder="Search account or deal name…">
+    <select id="fRegion"><option value="">All Regions</option><option value="Americas">Americas</option><option value="EMEA">EMEA</option><option value="International">International</option><option value="—">—</option></select>
+    <select id="fHub"><option value="">All Hub Types</option><option value="Real-Time">Real-Time</option><option value="Offline">Offline</option><option value="RT + Offline">RT + Offline</option></select>
+    <select id="fGl"><option value="">All Go-Live</option><option value="Live">Live</option><option value="Delayed">Delayed</option><option value="ETA">ETA</option><option value="TBD">TBD</option></select>
+  </div>
+
+  <table id="tbl">
+    <thead><tr>
+      <th data-k="acct">Account <span class="ar"></span></th>
+      <th data-k="name">Deal Name <span class="ar"></span></th>
+      <th data-k="type">Type <span class="ar"></span></th>
+      <th data-k="integ">Integration <span class="ar"></span></th>
+      <th data-k="hub">Hub <span class="ar"></span></th>
+      <th data-k="close">Close Date <span class="ar"></span></th>
+      <th data-k="acv">ACV <span class="ar"></span></th>
+      <th data-k="agents">Agents <span class="ar"></span></th>
+      <th data-k="region">Region <span class="ar"></span></th>
+      <th data-k="gl">Go-Live <span class="ar"></span></th>
+      <th data-k="owner">Owner <span class="ar"></span></th>
+    </tr></thead>
+    <tbody id="tb">
+<tr class="grp"><td colspan="11">INTUIT INC <span class="grpmeta">1 deal · $103,599 USD</span></td></tr>
+<tr class="deal" data-acct="INTUIT INC." data-name="Intuit | CXone | SmartReach | 125" data-region="Americas" data-hub="Offline" data-gl="eta"><td>INTUIT INC.</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui0000226yLtIAI/view" target="_blank" rel="noopener">Intuit | CXone | SmartReach | 125</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2026-05-27</td><td class="num">$103,599 <span class="cur">USD</span></td><td class="num">125</td><td>Americas</td><td><span class="gl gl-eta">ETA 2026-07-01</span></td><td>Wendy Ball</td></tr>
+<tr class="grp"><td colspan="11">OneMain Financial <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="OneMain Financial" data-name="OneMain Financial - Amendment 11" data-region="Americas" data-hub="Offline" data-gl="tbd"><td>OneMain Financial</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002JQIdFIAX/view" target="_blank" rel="noopener">OneMain Financial - Amendment 11</a></td><td>Addendum</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2026-05-20</td><td class="num">$0 <span class="cur">USD</span></td><td class="num">—</td><td>Americas</td><td><span class="gl gl-tbd">TBD</span></td><td>Luke Johnson</td></tr>
+<tr class="grp"><td colspan="11">NATIONAL GRID <span class="grpmeta">4 deals · $2,163,872 USD</span></td></tr>
+<tr class="deal" data-acct="NATIONAL GRID USA SERVICE COMPANY INC" data-name="NATIONAL GRID CXOne Recording/QM/Analytics New LOB ICOR Outsource Takeout 100 Agent $74,700 ACV" data-region="Americas" data-hub="Real-Time" data-gl="tbd"><td>NATIONAL GRID USA SERVICE COMPANY INC</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002Lscb7IAB/view" target="_blank" rel="noopener">NATIONAL GRID CXOne Recording/QM/Analytics New LOB ICOR Outsource Takeout 100 Agent $74,700 ACV</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2026-05-05</td><td class="num">$74,705 <span class="cur">USD</span></td><td class="num">100</td><td>Americas</td><td><span class="gl gl-tbd">TBD</span></td><td>Dave Smith</td></tr>
+<tr class="deal" data-acct="NATIONAL GRID USA SERVICE COMPANY INC" data-name="NATIONAL GRID USA SERVICE COMPANY INC New LOB  400 Agent Add" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>NATIONAL GRID USA SERVICE COMPANY INC</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001hh2wXIAQ/view" target="_blank" rel="noopener">NATIONAL GRID USA SERVICE COMPANY INC New LOB  400 Agent Add</a></td><td>Exst. Customer / Expansions</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-09-23</td><td class="num">$298,800 <span class="cur">USD</span></td><td class="num">400</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Dave Smith</td></tr>
+<tr class="deal" data-acct="NATIONAL GRID USA SERVICE COMPANY INC" data-name="NATIONAL GRID Multi ACD | QA | IA  | New Service LOB 300 Agent Add $224K" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>NATIONAL GRID USA SERVICE COMPANY INC</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000sVL5tIAG/view" target="_blank" rel="noopener">NATIONAL GRID Multi ACD | QA | IA  | New Service LOB 300 Agent Add $224K</a></td><td>Addendum</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-12-09</td><td class="num">$224,100 <span class="cur">USD</span></td><td class="num">300</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Dave Smith</td></tr>
+<tr class="deal" data-acct="NATIONAL GRID USA SERVICE COMPANY INC" data-name="National Grid Attached CXone OPEN CISCO Analytics Quality  2000  Agents Attached Oppty 3 of 3" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>NATIONAL GRID USA SERVICE COMPANY INC</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/0063n0000120KE3AAM/view" target="_blank" rel="noopener">National Grid Attached CXone OPEN CISCO Analytics Quality  2000  Agents Attached Oppty 3 of 3</a></td><td>New Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2023-12-29</td><td class="num">$1,566,267 <span class="cur">USD</span></td><td class="num">2000</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Dave Smith</td></tr>
+<tr class="grp"><td colspan="11">SHARP HEALTHCARE <span class="grpmeta">1 deal · $264,720 USD</span></td></tr>
+<tr class="deal" data-acct="SHARP HEALTHCARE" data-name="Sharp | Interaction Hub Migrated Calls" data-region="Americas" data-hub="Offline" data-gl="delayed"><td>SHARP HEALTHCARE</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui000029nDfRIAU/view" target="_blank" rel="noopener">Sharp | Interaction Hub Migrated Calls</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2026-04-30</td><td class="num">$264,720 <span class="cur">USD</span></td><td class="num">500</td><td>Americas</td><td><span class="gl gl-delayed">Delayed 2026-05-31</span></td><td>Noa Nightingale</td></tr>
+<tr class="grp"><td colspan="11">Makes Cents Inc. <span class="grpmeta">1 deal · $210,828 USD</span></td></tr>
+<tr class="deal" data-acct="MAKES CENTS INC." data-name="Makes Cents | NiCE CXone SmartReach 35" data-region="Americas" data-hub="Offline" data-gl="delayed"><td>MAKES CENTS INC.</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002H5zzQIAR/view" target="_blank" rel="noopener">Makes Cents | NiCE CXone SmartReach 35</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2026-04-23</td><td class="num">$210,828 <span class="cur">USD</span></td><td class="num">35</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-09-21</span></td><td>TeeJay Johnson</td></tr>
+<tr class="grp"><td colspan="11">THE AUTOMOBILE ASSOCIATION LIMITED <span class="grpmeta">2 deals · $2 USD</span></td></tr>
+<tr class="deal" data-acct="THE AA" data-name="the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config" data-region="International" data-hub="Real-Time" data-gl="delayed"><td>THE AA</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001iMFxqIAG/view" target="_blank" rel="noopener">the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2026-03-31</td><td class="num">£2,166,667 <span class="cur">GBP</span></td><td class="num">2345</td><td>International</td><td><span class="gl gl-delayed">Delayed → 2027-02-26</span></td><td>Ian O&#x27;Farrell</td></tr>
+<tr class="deal" data-acct="THE AA" data-name="the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config - Internal Allocation Booking - DO NOT CONTRACT" data-region="International" data-hub="Real-Time" data-gl="tbd"><td>THE AA</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002ITdIjIAL/view" target="_blank" rel="noopener">the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config - Internal Allocation Booking - DO NOT CONTRACT</a></td><td>Exception True-Up</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2026-03-31</td><td class="num">$2 <span class="cur">USD</span></td><td class="num">—</td><td>International</td><td><span class="gl gl-tbd">TBD</span></td><td>Ian O&#x27;Farrell</td></tr>
+<tr class="grp"><td colspan="11">Northwestern Memorial Healthcare <span class="grpmeta">1 deal · $58,417 USD</span></td></tr>
+<tr class="deal" data-acct="NORTHWESTERN MEMORIAL HEALTHCARE" data-name="NORTHWESTERN MEMORIAL HEALTHCARE |  Amendment  | Engagement Hub and Screen Recording Advanced" data-region="Americas" data-hub="Real-Time" data-gl="delayed"><td>NORTHWESTERN MEMORIAL HEALTHCARE</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001oDCinIAG/view" target="_blank" rel="noopener">NORTHWESTERN MEMORIAL HEALTHCARE |  Amendment  | Engagement Hub and Screen Recording Advanced</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2026-03-24</td><td class="num">$58,417 <span class="cur">USD</span></td><td class="num">—</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-09-11</span></td><td>Kyler Wilson</td></tr>
+<tr class="grp"><td colspan="11">Kryterion <span class="grpmeta">1 deal · $65,724 USD</span></td></tr>
+<tr class="deal" data-acct="KRYTERION" data-name="Kryterion | Multi-ACD | QMA | WFM | 210" data-region="Americas" data-hub="Offline" data-gl="eta"><td>KRYTERION</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001wt5upIAA/view" target="_blank" rel="noopener">Kryterion | Multi-ACD | QMA | WFM | 210</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span><span class="ibadge" style="background:#7B2FF7">Ticketing</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2026-03-20</td><td class="num">$65,724 <span class="cur">USD</span></td><td class="num">200</td><td>Americas</td><td><span class="gl gl-eta">ETA 2026-08-03</span></td><td>Scott Steinert</td></tr>
+<tr class="grp"><td colspan="11">Spire Inc. <span class="grpmeta">1 deal · $1,432,109 USD</span></td></tr>
+<tr class="deal" data-acct="SPIRE" data-name="Spire Energy | Accenture | CXone | 500" data-region="Americas" data-hub="Offline" data-gl="delayed"><td>SPIRE</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001BopzlIAB/view" target="_blank" rel="noopener">Spire Energy | Accenture | CXone | 500</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2026-01-20</td><td class="num">$1,432,109 <span class="cur">USD</span></td><td class="num">500</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-10-15</span></td><td>Jason Cates</td></tr>
+<tr class="grp"><td colspan="11">MERCY HEALTH <span class="grpmeta">1 deal · $537,758 USD</span></td></tr>
+<tr class="deal" data-acct="MERCY HEALTH" data-name="Mercy | Recording Upgrade | Multi-ACD | 1025" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>MERCY HEALTH</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001DqtztIAB/view" target="_blank" rel="noopener">Mercy | Recording Upgrade | Multi-ACD | 1025</a></td><td>Exst. Customer / Cloud conversion</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-12-31</td><td class="num">$537,758 <span class="cur">USD</span></td><td class="num">2300</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>AJ Fasano</td></tr>
+<tr class="grp"><td colspan="11">ASSOCIATION OF CHARTERED ACCOUNTANTS <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="ACCA" data-name="ACCA | SVL | CXone | Hub | 150" data-region="International" data-hub="Real-Time" data-gl="delayed"><td>ACCA</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001cVjNRIA0/view" target="_blank" rel="noopener">ACCA | SVL | CXone | Hub | 150</a></td><td>Exst. Customer / New BU</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-12-24</td><td class="num">£44,730 <span class="cur">GBP</span></td><td class="num">150</td><td>International</td><td><span class="gl gl-delayed">Delayed → 2026-10-08</span></td><td>Joshua Hendon</td></tr>
+<tr class="grp"><td colspan="11">GOUVERNEMENT DE LA PROVINCE DE QUEBEC <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="MINISTERE DU REVENU DU QUEBEC - CANADA - ENTERPRISEC" data-name="Revenu Quebec - CXone Multi ACD for CMS with QM for 2000" data-region="Americas" data-hub="Real-Time" data-gl="delayed"><td>MINISTERE DU REVENU DU QUEBEC - CANADA - ENTERPRISEC</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Hu00001V4FujIAF/view" target="_blank" rel="noopener">Revenu Quebec - CXone Multi ACD for CMS with QM for 2000</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-12-23</td><td class="num">C$587,692 <span class="cur">CAD</span></td><td class="num">1800</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-08-03</span></td><td>Ian Gillman</td></tr>
+<tr class="grp"><td colspan="11">SKIPTON BUILDING SOCIETY <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="SKIPTON BUILDING SOCIETY - UK" data-name="Teams recording solution" data-region="—" data-hub="Real-Time" data-gl="live"><td>SKIPTON BUILDING SOCIETY - UK</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001f4ZVJIA2/view" target="_blank" rel="noopener">Teams recording solution</a></td><td>New OCR Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-12-19</td><td class="num">£34,693 <span class="cur">GBP</span></td><td class="num">410</td><td>—</td><td><span class="gl gl-live">Live</span></td><td>Steven Lee</td></tr>
+<tr class="grp"><td colspan="11">United Faith Ministries, Inc. <span class="grpmeta">1 deal · $390,769 USD</span></td></tr>
+<tr class="deal" data-acct="UHSM" data-name="UHSM | CXone | Suite | 130 Agents" data-region="—" data-hub="Offline" data-gl="delayed"><td>UHSM</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001eiPHjIAM/view" target="_blank" rel="noopener">UHSM | CXone | Suite | 130 Agents</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2025-11-25</td><td class="num">$390,769 <span class="cur">USD</span></td><td class="num">145</td><td>—</td><td><span class="gl gl-delayed">Delayed → 2026-08-28</span></td><td>Jesse DiCocco</td></tr>
+<tr class="grp"><td colspan="11">TELEPHONE AND DATA SYSTEMS, INC. <span class="grpmeta">1 deal · $1,415,004 USD</span></td></tr>
+<tr class="deal" data-acct="TDS TELECOM" data-name="TDS Telecom | CXone, Enlighten | 1100" data-region="Americas" data-hub="Offline" data-gl="delayed"><td>TDS TELECOM</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000vVOQDIA4/view" target="_blank" rel="noopener">TDS Telecom | CXone, Enlighten | 1100</a></td><td>New Logo</td><td><span class="ibadge" style="background:#FF8A00">SmartReach</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2025-11-17</td><td class="num">$1,415,004 <span class="cur">USD</span></td><td class="num">1100</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2028-01-19</span></td><td>Todd Brown</td></tr>
+<tr class="grp"><td colspan="11">Payward, Inc. <span class="grpmeta">1 deal · $11,520 USD</span></td></tr>
+<tr class="deal" data-acct="PAYWARD, INC." data-name="Kraken - 2025 Playvox QM Campaign (Project Catalyst)" data-region="Americas" data-hub="Offline" data-gl="live"><td>PAYWARD, INC.</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001K1hWjIAJ/view" target="_blank" rel="noopener">Kraken - 2025 Playvox QM Campaign (Project Catalyst)</a></td><td>Exst. Customer / New LOB</td><td><span class="ibadge" style="background:#7B2FF7">Ticketing</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2025-10-22</td><td class="num">$11,520 <span class="cur">USD</span></td><td class="num">60</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Ali Cazel</td></tr>
+<tr class="grp"><td colspan="11">WNS (HOLDINGS) LTD <span class="grpmeta">2 deals · $333,319 USD</span></td></tr>
+<tr class="deal" data-acct="WNS GLOBAL SERVICES (P) LTD - INDIA - HQ" data-name="WNS On Prem to Cloud (Multi ACD) US BU 200" data-region="International" data-hub="Real-Time" data-gl="live"><td>WNS GLOBAL SERVICES (P) LTD - INDIA - HQ</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001jQGbVIAW/view" target="_blank" rel="noopener">WNS On Prem to Cloud (Multi ACD) US BU 200</a></td><td>Exst. Customer / New BU</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-09-26</td><td class="num">$28,966 <span class="cur">USD</span></td><td class="num">200</td><td>International</td><td><span class="gl gl-live">Live</span></td><td>Mayur Jorapur</td></tr>
+<tr class="deal" data-acct="WNS GLOBAL SERVICES (P) LTD - TOKYU BU" data-name="WNS On Prem to Cloud (Multi ACD) Tokyo BU" data-region="International" data-hub="Real-Time" data-gl="live"><td>WNS GLOBAL SERVICES (P) LTD - TOKYU BU</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001HUFljIAH/view" target="_blank" rel="noopener">WNS On Prem to Cloud (Multi ACD) Tokyo BU</a></td><td>Exst. Customer / New BU</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-09-26</td><td class="num">$304,352 <span class="cur">USD</span></td><td class="num">—</td><td>International</td><td><span class="gl gl-live">Live</span></td><td>Mayur Jorapur</td></tr>
+<tr class="grp"><td colspan="11">THE TORONTO-DOMINION BANK <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="THE TORONTO-DOMINION BANK US WEST" data-name="TD Bank Financial Group - CXone Multi ACD - Verint Takeout" data-region="Americas" data-hub="RT + Offline" data-gl="delayed"><td>THE TORONTO-DOMINION BANK US WEST</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/0063n000011zsc1AAA/view" target="_blank" rel="noopener">TD Bank Financial Group - CXone Multi ACD - Verint Takeout</a></td><td>Addendum</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#6100FF">RT + Offline</span></td><td class="nowrap">2025-09-26</td><td class="num">C$3,718,701 <span class="cur">CAD</span></td><td class="num">—</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-11-27</span></td><td>Neil Balthazaar</td></tr>
+<tr class="grp"><td colspan="11">Accurate Background, LLC <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="ACCURATE BACKGROUND" data-name="Accurate Background | CXone QMA" data-region="—" data-hub="Offline" data-gl="delayed"><td>ACCURATE BACKGROUND</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001FlFCAIA3/view" target="_blank" rel="noopener">Accurate Background | CXone QMA</a></td><td>Exst. Customer / New LOB</td><td><span class="ibadge" style="background:#7B2FF7">Ticketing</span></td><td><span class="hub" style="background:#36EAD0">Offline</span></td><td class="nowrap">2025-08-15</td><td class="num">$0 <span class="cur">USD</span></td><td class="num">200</td><td>—</td><td><span class="gl gl-delayed">Delayed → 2026-12-31</span></td><td>Emily Gray</td></tr>
+<tr class="grp"><td colspan="11">AGEAS INSURANCE INTERNATIONAL <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="AGEAS UK - UK - ENTERPRISE" data-name="Ageas UK | SVL | Multi ACD &amp; QM | 2400 / 100" data-region="International" data-hub="Real-Time" data-gl="eta"><td>AGEAS UK - UK - ENTERPRISE</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000hp5eQIAQ/view" target="_blank" rel="noopener">Ageas UK | SVL | Multi ACD &amp; QM | 2400 / 100</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-06-30</td><td class="num">£124,975 <span class="cur">GBP</span></td><td class="num">2400</td><td>International</td><td><span class="gl gl-eta">ETA 2026-07-03</span></td><td>Steven Lee</td></tr>
+<tr class="grp"><td colspan="11">UNITEDHEALTH GROUP INCORPORATED <span class="grpmeta">1 deal · $246,690 USD</span></td></tr>
+<tr class="deal" data-acct="OPTUMRX" data-name="UHG - Optum RX Uptivity Migration 450" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>OPTUMRX</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Hu00001XhMB1IAN/view" target="_blank" rel="noopener">UHG - Optum RX Uptivity Migration 450</a></td><td>Addendum</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-06-30</td><td class="num">$246,690 <span class="cur">USD</span></td><td class="num">720</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Amy Wiesenmayer</td></tr>
+<tr class="grp"><td colspan="11">LOWE&#x27;S COMPANIES, INC. <span class="grpmeta">1 deal · $680,352 USD</span></td></tr>
+<tr class="deal" data-acct="LOWE’S COMPANIES, INC." data-name="LOWE’S COMPANIES, INC. |  Amendment  | Conversion from Engage to Multi ACD" data-region="Americas" data-hub="Real-Time" data-gl="delayed"><td>LOWE’S COMPANIES, INC.</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001Iy7JtIAJ/view" target="_blank" rel="noopener">LOWE’S COMPANIES, INC. |  Amendment  | Conversion from Engage to Multi ACD</a></td><td>Addendum</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-06-18</td><td class="num">$680,352 <span class="cur">USD</span></td><td class="num">1730</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-10-05</span></td><td>Tony Hawkins</td></tr>
+<tr class="grp"><td colspan="11">METLIFE, INC. <span class="grpmeta">2 deals · $152,528 USD</span></td></tr>
+<tr class="deal" data-acct="METLIFE INSURANCE K.K." data-name="MetLife JPN | CXone Prod BU | Amendment | CXone Multi ACD Recording 600" data-region="International" data-hub="Real-Time" data-gl="live"><td>METLIFE INSURANCE K.K.</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000Ro4QfIAJ/view" target="_blank" rel="noopener">MetLife JPN | CXone Prod BU | Amendment | CXone Multi ACD Recording 600</a></td><td>Addendum</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-05-16</td><td class="num">$151,234 <span class="cur">USD</span></td><td class="num">—</td><td>International</td><td><span class="gl gl-live">Live</span></td><td>Tadamichi Yanagisawa</td></tr>
+<tr class="deal" data-acct="METLIFE INSURANCE K.K. DEV" data-name="MetLife JPN | CXone Dev BU | Amendment | CXone Multi ACD Recording 5" data-region="International" data-hub="Real-Time" data-gl="live"><td>METLIFE INSURANCE K.K. DEV</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000jHgc1IAC/view" target="_blank" rel="noopener">MetLife JPN | CXone Dev BU | Amendment | CXone Multi ACD Recording 5</a></td><td>Addendum</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-12-25</td><td class="num">$1,294 <span class="cur">USD</span></td><td class="num">—</td><td>International</td><td><span class="gl gl-live">Live</span></td><td>Tadamichi Yanagisawa</td></tr>
+<tr class="grp"><td colspan="11">Nutrien Ltd. <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="NUTRIEN US LLC" data-name="Nutrien US LLC | Amendment | Uptivity Displacement" data-region="—" data-hub="Real-Time" data-gl="live"><td>NUTRIEN US LLC</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001AmVpfIAF/view" target="_blank" rel="noopener">Nutrien US LLC | Amendment | Uptivity Displacement</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-05-16</td><td class="num">$0 <span class="cur">USD</span></td><td class="num">100</td><td>—</td><td><span class="gl gl-live">Live</span></td><td>Julie Henderson</td></tr>
+<tr class="grp"><td colspan="11">Phelps County Regional Medical Center <span class="grpmeta">1 deal · $806 USD</span></td></tr>
+<tr class="deal" data-acct="PHELPS MEDICAL CENTER" data-name="Phelps County Regional Medical Center | Amendment | Uptivity Conversion" data-region="—" data-hub="Real-Time" data-gl="delayed"><td>PHELPS MEDICAL CENTER</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui000012MCldIAG/view" target="_blank" rel="noopener">Phelps County Regional Medical Center | Amendment | Uptivity Conversion</a></td><td>New OCR Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-05-12</td><td class="num">$806 <span class="cur">USD</span></td><td class="num">13</td><td>—</td><td><span class="gl gl-delayed">Delayed → 2026-07-24</span></td><td>Julie Henderson</td></tr>
+<tr class="grp"><td colspan="11">Sierra Bancorp <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="BANK OF THE SIERRA" data-name="Bank of the Sierra | 2024 Uptivity Campaign" data-region="—" data-hub="Real-Time" data-gl="delayed"><td>BANK OF THE SIERRA</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000uEyNRIA0/view" target="_blank" rel="noopener">Bank of the Sierra | 2024 Uptivity Campaign</a></td><td>Exst. Customer / Cloud conversion</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-04-25</td><td class="num">$0 <span class="cur">USD</span></td><td class="num">30</td><td>—</td><td><span class="gl gl-delayed">Delayed → 2026-07-17</span></td><td>Kalie Phillipy</td></tr>
+<tr class="grp"><td colspan="11">CONTINENTAL AG <span class="grpmeta">1 deal · $7,896 USD</span></td></tr>
+<tr class="deal" data-acct="CONTINENTAL TIRE" data-name="Continental Tire | 2024 Uptivity Campaign| 150" data-region="Americas" data-hub="Real-Time" data-gl="eta"><td>CONTINENTAL TIRE</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000RDFZZIA5/view" target="_blank" rel="noopener">Continental Tire | 2024 Uptivity Campaign| 150</a></td><td>Exst. Customer / New BU</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-04-22</td><td class="num">$7,896 <span class="cur">USD</span></td><td class="num">—</td><td>Americas</td><td><span class="gl gl-eta">ETA 2026-06-12</span></td><td>Connor Rose</td></tr>
+<tr class="grp"><td colspan="11">REGIONS FINANCIAL CORPORATION <span class="grpmeta">1 deal · $409,956 USD</span></td></tr>
+<tr class="deal" data-acct="REGIONS FINANCIAL CORPORATION" data-name="Regions  Financial Corporation | Call Recording | 2,150 | Multi-ACD" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>REGIONS FINANCIAL CORPORATION</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000ZrcvpIAB/view" target="_blank" rel="noopener">Regions  Financial Corporation | Call Recording | 2,150 | Multi-ACD</a></td><td>New OCR Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-03-31</td><td class="num">$409,956 <span class="cur">USD</span></td><td class="num">1150</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Ed Lewczyk</td></tr>
+<tr class="grp"><td colspan="11">AMERICAN NATIONAL INSURANCE COMPANY <span class="grpmeta">1 deal · $270,307 USD</span></td></tr>
+<tr class="deal" data-acct="AMERICAN NATIONAL INSURANCE COMPANY INC (ANICO)" data-name="American National | Multi ACD | New BU" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>AMERICAN NATIONAL INSURANCE COMPANY INC (ANICO)</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000rIseYIAS/view" target="_blank" rel="noopener">American National | Multi ACD | New BU</a></td><td>Exst. Customer / New BU</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2025-02-27</td><td class="num">$270,307 <span class="cur">USD</span></td><td class="num">—</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Cassie Schroeder</td></tr>
+<tr class="grp"><td colspan="11">Lifeline of Canada Holdings Ltd <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="LIFELINE OF CANADA HOLDINGS" data-name="Lifeline Systems Canada, Inc. - 2024 Uptivity Campaign" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>LIFELINE OF CANADA HOLDINGS</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000fy5V3IAI/view" target="_blank" rel="noopener">Lifeline Systems Canada, Inc. - 2024 Uptivity Campaign</a></td><td>New Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-12-17</td><td class="num">C$122,472 <span class="cur">CAD</span></td><td class="num">130</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Curtis Hawkins</td></tr>
+<tr class="grp"><td colspan="11">St. Luke&#x27;s Health System, Ltd. <span class="grpmeta">1 deal · $248,556 USD</span></td></tr>
+<tr class="deal" data-acct="ST. LUKE&#x27;S HEALTH SYSTEM" data-name="St Luke&#x27;s | ICS | CXone | Multi ACD | 1000" data-region="Americas" data-hub="Real-Time" data-gl="delayed"><td>ST. LUKE&#x27;S HEALTH SYSTEM</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000OPWQHIA5/view" target="_blank" rel="noopener">St Luke&#x27;s | ICS | CXone | Multi ACD | 1000</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-12-04</td><td class="num">$248,556 <span class="cur">USD</span></td><td class="num">70</td><td>Americas</td><td><span class="gl gl-delayed">Delayed → 2026-08-17</span></td><td>Ryan Black</td></tr>
+<tr class="grp"><td colspan="11">INTEGRATED CARE 24 LIMITED <span class="grpmeta">1 deal · $0 USD</span></td></tr>
+<tr class="deal" data-acct="INTEGRATED CARE 24" data-name="IC24- CCaaS" data-region="EMEA" data-hub="Real-Time" data-gl="live"><td>INTEGRATED CARE 24</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Hu00001V4dsSIAR/view" target="_blank" rel="noopener">IC24- CCaaS</a></td><td>New OCR Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-11-21</td><td class="num">£441,767 <span class="cur">GBP</span></td><td class="num">600</td><td>EMEA</td><td><span class="gl gl-live">Live</span></td><td>Adam Massingberd - Mundy</td></tr>
+<tr class="grp"><td colspan="11">AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED <span class="grpmeta">2 deals · $356,395 USD</span></td></tr>
+<tr class="deal" data-acct="ANZ" data-name="ANZ Bank | Australia | Cloud Recording Multi ACD" data-region="International" data-hub="Real-Time" data-gl="live"><td>ANZ</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000Ql3rVIAR/view" target="_blank" rel="noopener">ANZ Bank | Australia | Cloud Recording Multi ACD</a></td><td>Exst. Customer / Cloud conversion</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-10-10</td><td class="num">A$1,544,374 <span class="cur">AUD</span></td><td class="num">4320</td><td>International</td><td><span class="gl gl-live">Live</span></td><td>Andrew Austin</td></tr>
+<tr class="deal" data-acct="ANZ" data-name="ANZ Bank - Australia - Cloud Recording Multi ACD - split" data-region="International" data-hub="Real-Time" data-gl="tbd"><td>ANZ</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000pY77IIAS/view" target="_blank" rel="noopener">ANZ Bank - Australia - Cloud Recording Multi ACD - split</a></td><td>Exst. Customer / Cloud conversion</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-10-10</td><td class="num">$356,395 <span class="cur">USD</span></td><td class="num">—</td><td>International</td><td><span class="gl gl-tbd">TBD</span></td><td>Richard Langstaff</td></tr>
+<tr class="grp"><td colspan="11">Healthcare Partners <span class="grpmeta">1 deal · $104,808 USD</span></td></tr>
+<tr class="deal" data-acct="HEALTHCARE PARTNERS" data-name="Healthcare Partners | Intelisys | CASS | Multi-ACD | 130" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>HEALTHCARE PARTNERS</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000Lg0abIAB/view" target="_blank" rel="noopener">Healthcare Partners | Intelisys | CASS | Multi-ACD | 130</a></td><td>Exst. Customer / New LOB</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-09-27</td><td class="num">$104,808 <span class="cur">USD</span></td><td class="num">130</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Tyler Walker</td></tr>
+<tr class="grp"><td colspan="11">EL PASO WATER UTILITIES <span class="grpmeta">1 deal · $31,922 USD</span></td></tr>
+<tr class="deal" data-acct="EL PASO WATER UTILITIES" data-name="El Paso Water Utilities- Multi-ACD" data-region="Americas" data-hub="Real-Time" data-gl="live"><td>EL PASO WATER UTILITIES</td><td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/0063n000010Dx2BAAS/view" target="_blank" rel="noopener">El Paso Water Utilities- Multi-ACD</a></td><td>New OCR Logo</td><td><span class="muted">—</span></td><td><span class="hub" style="background:#3694FC">Real-Time</span></td><td class="nowrap">2024-06-27</td><td class="num">$31,922 <span class="cur">USD</span></td><td class="num">50</td><td>Americas</td><td><span class="gl gl-live">Live</span></td><td>Lance Johnson</td></tr>
+    </tbody>
+  </table>
 </div>
 
 <script>
-const PWHASH="fa34e5bac87849343e48ccec9965e86629502a7f0c7c9f1e18abaa8a2240e673";
-const ROWS=[{"id": "006Ui0000226yLtIAI", "account": "INTUIT INC.", "group": "INTUIT INC", "name": "Intuit | CXone | SmartReach | 125", "type": "New Logo", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2026-05-27", "acv": 103598.64, "cur": "USD", "acvfmt": "$103,599", "agents": 125, "region": "Americas", "golive": "ETA 2026-07-01", "golivecat": "ETA", "owner": "Wendy Ball", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui0000226yLtIAI/view"}, {"id": "006Ui00002Lscb7IAB", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "group": "NATIONAL GRID", "name": "NATIONAL GRID CXOne Recording/QM/Analytics New LOB ICOR Outsource Takeout 100 Agent $74,700 ACV", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2026-05-05", "acv": 74704.8, "cur": "USD", "acvfmt": "$74,705", "agents": 100, "region": "Americas", "golive": "TBD", "golivecat": "TBD", "owner": "Dave Smith", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002Lscb7IAB/view"}, {"id": "006Ui000029nDfRIAU", "account": "SHARP HEALTHCARE", "group": "SHARP HEALTHCARE", "name": "Sharp | Interaction Hub Migrated Calls", "type": "New Logo", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2026-04-30", "acv": 264720, "cur": "USD", "acvfmt": "$264,720", "agents": 500, "region": "Americas", "golive": "Delayed 2026-05-31", "golivecat": "Delayed", "owner": "Noa Nightingale", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui000029nDfRIAU/view"}, {"id": "006Ui00002H5zzQIAR", "account": "MAKES CENTS INC.", "group": "Makes Cents Inc.", "name": "Makes Cents | NiCE CXone SmartReach 35", "type": "New Logo", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2026-04-23", "acv": 210828.48, "cur": "USD", "acvfmt": "$210,828", "agents": 35, "region": "Americas", "golive": "Delayed \u2192 2026-09-21", "golivecat": "Delayed", "owner": "TeeJay Johnson", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002H5zzQIAR/view"}, {"id": "006Ui00001iMFxqIAG", "account": "THE AA", "group": "THE AUTOMOBILE ASSOCIATION LIMITED", "name": "the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2026-03-31", "acv": 2166666.72, "cur": "GBP", "acvfmt": "GBP 2,166,667", "agents": 2345, "region": "International", "golive": "Delayed \u2192 2027-02-26", "golivecat": "Delayed", "owner": "Ian O'Farrell", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001iMFxqIAG/view"}, {"id": "006Ui00002ITdIjIAL", "account": "THE AA", "group": "THE AUTOMOBILE ASSOCIATION LIMITED", "name": "the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config - Internal Allocation Booking - DO NOT CONTRACT", "type": "Exception True-Up", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2026-03-31", "acv": 2.12, "cur": "USD", "acvfmt": "$2", "agents": "\u2014", "region": "International", "golive": "TBD", "golivecat": "TBD", "owner": "Ian O'Farrell", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002ITdIjIAL/view"}, {"id": "006Ui00001oDCinIAG", "account": "NORTHWESTERN MEMORIAL HEALTHCARE", "group": "Northwestern Memorial Healthcare", "name": "NORTHWESTERN MEMORIAL HEALTHCARE |  Amendment  | Engagement Hub and Screen Recording Advanced", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2026-03-24", "acv": 58417.2, "cur": "USD", "acvfmt": "$58,417", "agents": "\u2014", "region": "Americas", "golive": "Delayed \u2192 2026-09-11", "golivecat": "Delayed", "owner": "Kyler Wilson", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001oDCinIAG/view"}, {"id": "006Ui00001wt5upIAA", "account": "KRYTERION", "group": "Kryterion", "name": "Kryterion | Multi-ACD | QMA | WFM | 210", "type": "New Logo", "integ": ["SmartReach", "Ticketing"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2026-03-20", "acv": 65724.02, "cur": "USD", "acvfmt": "$65,724", "agents": 200, "region": "Americas", "golive": "ETA 2026-08-03", "golivecat": "ETA", "owner": "Scott Steinert", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001wt5upIAA/view"}, {"id": "006Ui00001BopzlIAB", "account": "SPIRE", "group": "Spire Inc.", "name": "Spire Energy | Accenture | CXone | 500", "type": "New Logo", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2026-01-20", "acv": 1432109.47, "cur": "USD", "acvfmt": "$1,432,109", "agents": 500, "region": "Americas", "golive": "Delayed \u2192 2026-10-15", "golivecat": "Delayed", "owner": "Jason Cates", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001BopzlIAB/view"}, {"id": "006Ui00001DqtztIAB", "account": "MERCY HEALTH", "group": "MERCY HEALTH", "name": "Mercy | Recording Upgrade | Multi-ACD | 1025", "type": "Exst. Customer / Cloud conversion", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-12-31", "acv": 537757.5, "cur": "USD", "acvfmt": "$537,758", "agents": 2300, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "AJ Fasano", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001DqtztIAB/view"}, {"id": "006Ui00001cVjNRIA0", "account": "ACCA", "group": "ASSOCIATION OF CHARTERED ACCOUNTANTS", "name": "ACCA | SVL | CXone | Hub | 150", "type": "Exst. Customer / New BU", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-12-24", "acv": 44730, "cur": "GBP", "acvfmt": "GBP 44,730", "agents": 150, "region": "International", "golive": "Delayed \u2192 2026-10-08", "golivecat": "Delayed", "owner": "Joshua Hendon", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001cVjNRIA0/view"}, {"id": "006Hu00001V4FujIAF", "account": "MINISTERE DU REVENU DU QUEBEC - CANADA - ENTERPRISEC", "group": "GOUVERNEMENT DE LA PROVINCE DE QUEBEC", "name": "Revenu Quebec - CXone Multi ACD for CMS with QM for 2000", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-12-23", "acv": 587691.91, "cur": "CAD", "acvfmt": "CAD 587,692", "agents": 1800, "region": "Americas", "golive": "Delayed \u2192 2026-08-03", "golivecat": "Delayed", "owner": "Ian Gillman", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Hu00001V4FujIAF/view"}, {"id": "006Ui00001f4ZVJIA2", "account": "SKIPTON BUILDING SOCIETY - UK", "group": "SKIPTON BUILDING SOCIETY", "name": "Teams recording solution", "type": "New OCR Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-12-19", "acv": 34692.96, "cur": "GBP", "acvfmt": "GBP 34,693", "agents": 410, "region": "\u2014", "golive": "Live", "golivecat": "Live", "owner": "Steven Lee", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001f4ZVJIA2/view"}, {"id": "006Ui00001eiPHjIAM", "account": "UHSM", "group": "United Faith Ministries, Inc.", "name": "UHSM | CXone | Suite | 130 Agents", "type": "New Logo", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2025-11-25", "acv": 390768.84, "cur": "USD", "acvfmt": "$390,769", "agents": 145, "region": "\u2014", "golive": "Delayed \u2192 2026-08-28", "golivecat": "Delayed", "owner": "Jesse DiCocco", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001eiPHjIAM/view"}, {"id": "006Ui00000vVOQDIA4", "account": "TDS TELECOM", "group": "TELEPHONE AND DATA SYSTEMS, INC.", "name": "TDS Telecom | CXone, Enlighten | 1100", "type": "New Logo", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2025-11-17", "acv": 1415003.8, "cur": "USD", "acvfmt": "$1,415,004", "agents": 1100, "region": "Americas", "golive": "Delayed \u2192 2028-01-19", "golivecat": "Delayed", "owner": "Todd Brown", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000vVOQDIA4/view"}, {"id": "006Ui00001K1hWjIAJ", "account": "PAYWARD, INC.", "group": "Payward, Inc.", "name": "Kraken - 2025 Playvox QM Campaign (Project Catalyst)", "type": "Exst. Customer / New LOB", "integ": ["Ticketing"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2025-10-22", "acv": 11520, "cur": "USD", "acvfmt": "$11,520", "agents": 60, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Ali Cazel", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001K1hWjIAJ/view"}, {"id": "006Ui00001jQGbVIAW", "account": "WNS GLOBAL SERVICES (P) LTD - INDIA - HQ", "group": "WNS (HOLDINGS) LTD", "name": "WNS On Prem to Cloud (Multi ACD) US BU 200", "type": "Exst. Customer / New BU", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-09-26", "acv": 28966.32, "cur": "USD", "acvfmt": "$28,966", "agents": 200, "region": "International", "golive": "Live", "golivecat": "Live", "owner": "Mayur Jorapur", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001jQGbVIAW/view"}, {"id": "006Ui00001HUFljIAH", "account": "WNS GLOBAL SERVICES (P) LTD - TOKYU BU", "group": "WNS (HOLDINGS) LTD", "name": "WNS On Prem to Cloud (Multi ACD) Tokyo BU", "type": "Exst. Customer / New BU", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-09-26", "acv": 304352.28, "cur": "USD", "acvfmt": "$304,352", "agents": "\u2014", "region": "International", "golive": "Live", "golivecat": "Live", "owner": "Mayur Jorapur", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001HUFljIAH/view"}, {"id": "0063n000011zsc1AAA", "account": "THE TORONTO-DOMINION BANK US WEST", "group": "THE TORONTO-DOMINION BANK", "name": "TD Bank Financial Group - CXone Multi ACD - Verint Takeout", "type": "Addendum", "integ": [], "hub": "RT + Offline", "hubcolor": "#6100FF", "close": "2025-09-26", "acv": 3718700.67, "cur": "CAD", "acvfmt": "CAD 3,718,701", "agents": "\u2014", "region": "Americas", "golive": "Delayed \u2192 2026-11-27", "golivecat": "Delayed", "owner": "Neil Balthazaar", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/0063n000011zsc1AAA/view"}, {"id": "006Ui00001hh2wXIAQ", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "group": "NATIONAL GRID", "name": "NATIONAL GRID USA SERVICE COMPANY INC New LOB  400 Agent Add", "type": "Exst. Customer / Expansions", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-09-23", "acv": 298800, "cur": "USD", "acvfmt": "$298,800", "agents": 400, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Dave Smith", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001hh2wXIAQ/view"}, {"id": "006Ui00000hp5eQIAQ", "account": "AGEAS UK - UK - ENTERPRISE", "group": "AGEAS INSURANCE INTERNATIONAL", "name": "Ageas UK | SVL | Multi ACD & QM | 2400 / 100", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-06-30", "acv": 124975.28, "cur": "GBP", "acvfmt": "GBP 124,975", "agents": 2400, "region": "International", "golive": "ETA 2026-07-03", "golivecat": "ETA", "owner": "Steven Lee", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000hp5eQIAQ/view"}, {"id": "006Ui00001Iy7JtIAJ", "account": "LOWE\u2019S COMPANIES, INC.", "group": "LOWE'S COMPANIES, INC.", "name": "LOWE\u2019S COMPANIES, INC. |  Amendment  | Conversion from Engage to Multi ACD", "type": "Addendum", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-06-18", "acv": 680352.48, "cur": "USD", "acvfmt": "$680,352", "agents": 1730, "region": "Americas", "golive": "Delayed \u2192 2026-10-05", "golivecat": "Delayed", "owner": "Tony Hawkins", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001Iy7JtIAJ/view"}, {"id": "006Ui00000Ro4QfIAJ", "account": "METLIFE INSURANCE K.K.", "group": "METLIFE, INC.", "name": "MetLife JPN | CXone Prod BU | Amendment | CXone Multi ACD Recording 600", "type": "Addendum", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-05-16", "acv": 151233.96, "cur": "USD", "acvfmt": "$151,234", "agents": "\u2014", "region": "International", "golive": "ETA 2026-06-30", "golivecat": "ETA", "owner": "Tadamichi Yanagisawa", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000Ro4QfIAJ/view"}, {"id": "006Ui000012MCldIAG", "account": "PHELPS MEDICAL CENTER", "group": "Phelps County Regional Medical Center", "name": "Phelps County Regional Medical Center | Amendment | Uptivity Conversion", "type": "New OCR Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-05-12", "acv": 806.4, "cur": "USD", "acvfmt": "$806", "agents": 13, "region": "\u2014", "golive": "Delayed \u2192 2026-07-24", "golivecat": "Delayed", "owner": "Julie Henderson", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui000012MCldIAG/view"}, {"id": "006Ui00000RDFZZIA5", "account": "CONTINENTAL TIRE", "group": "CONTINENTAL AG", "name": "Continental Tire | 2024 Uptivity Campaign| 150", "type": "Exst. Customer / New BU", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-04-22", "acv": 7896, "cur": "USD", "acvfmt": "$7,896", "agents": "\u2014", "region": "Americas", "golive": "ETA 2026-06-12", "golivecat": "ETA", "owner": "Connor Rose", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000RDFZZIA5/view"}, {"id": "006Ui00000ZrcvpIAB", "account": "REGIONS FINANCIAL CORPORATION", "group": "REGIONS FINANCIAL CORPORATION", "name": "Regions  Financial Corporation | Call Recording | 2,150 | Multi-ACD", "type": "New OCR Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-03-31", "acv": 409955.83, "cur": "USD", "acvfmt": "$409,956", "agents": 1150, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Ed Lewczyk", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000ZrcvpIAB/view"}, {"id": "006Ui00000rIseYIAS", "account": "AMERICAN NATIONAL INSURANCE COMPANY INC (ANICO)", "group": "AMERICAN NATIONAL INSURANCE COMPANY", "name": "American National | Multi ACD | New BU", "type": "Exst. Customer / New BU", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-02-27", "acv": 270307.2, "cur": "USD", "acvfmt": "$270,307", "agents": "\u2014", "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Cassie Schroeder", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000rIseYIAS/view"}, {"id": "006Ui00000jHgc1IAC", "account": "METLIFE INSURANCE K.K. DEV", "group": "METLIFE, INC.", "name": "MetLife JPN | CXone Dev BU | Amendment | CXone Multi ACD Recording 5", "type": "Addendum", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-12-25", "acv": 1293.96, "cur": "USD", "acvfmt": "$1,294", "agents": "\u2014", "region": "International", "golive": "Live", "golivecat": "Live", "owner": "Tadamichi Yanagisawa", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000jHgc1IAC/view"}, {"id": "006Ui00000fy5V3IAI", "account": "LIFELINE OF CANADA HOLDINGS", "group": "Lifeline of Canada Holdings Ltd", "name": "Lifeline Systems Canada, Inc. - 2024 Uptivity Campaign", "type": "New Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-12-17", "acv": 122472, "cur": "CAD", "acvfmt": "CAD 122,472", "agents": 130, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Curtis Hawkins", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000fy5V3IAI/view"}, {"id": "006Ui00000sVL5tIAG", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "group": "NATIONAL GRID", "name": "NATIONAL GRID Multi ACD | QA | IA  | New Service LOB 300 Agent Add $224K", "type": "Addendum", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-12-09", "acv": 224100, "cur": "USD", "acvfmt": "$224,100", "agents": 300, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Dave Smith", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000sVL5tIAG/view"}, {"id": "006Ui00000OPWQHIA5", "account": "ST. LUKE'S HEALTH SYSTEM", "group": "St. Luke's Health System, Ltd.", "name": "St Luke's | ICS | CXone | Multi ACD | 1000", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-12-04", "acv": 248556, "cur": "USD", "acvfmt": "$248,556", "agents": 70, "region": "Americas", "golive": "Delayed \u2192 2026-08-17", "golivecat": "Delayed", "owner": "Ryan Black", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000OPWQHIA5/view"}, {"id": "006Hu00001V4dsSIAR", "account": "INTEGRATED CARE 24", "group": "INTEGRATED CARE 24 LIMITED", "name": "IC24- CCaaS", "type": "New OCR Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-11-21", "acv": 441766.68, "cur": "GBP", "acvfmt": "GBP 441,767", "agents": 600, "region": "EMEA", "golive": "Live", "golivecat": "Live", "owner": "Adam Massingberd - Mundy", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Hu00001V4dsSIAR/view"}, {"id": "006Ui00000Ql3rVIAR", "account": "ANZ", "group": "AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED", "name": "ANZ Bank | Australia | Cloud Recording Multi ACD", "type": "Exst. Customer / Cloud conversion", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-10-10", "acv": 1544373.6, "cur": "AUD", "acvfmt": "AUD 1,544,374", "agents": 4320, "region": "International", "golive": "Live", "golivecat": "Live", "owner": "Andrew Austin", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000Ql3rVIAR/view"}, {"id": "006Ui00000pY77IIAS", "account": "ANZ", "group": "AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED", "name": "ANZ Bank - Australia - Cloud Recording Multi ACD - split", "type": "Exst. Customer / Cloud conversion", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-10-10", "acv": 356395, "cur": "USD", "acvfmt": "$356,395", "agents": "\u2014", "region": "International", "golive": "TBD", "golivecat": "TBD", "owner": "Richard Langstaff", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000pY77IIAS/view"}, {"id": "006Ui00000Lg0abIAB", "account": "HEALTHCARE PARTNERS", "group": "Healthcare Partners", "name": "Healthcare Partners | Intelisys | CASS | Multi-ACD | 130", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-09-27", "acv": 104808.2, "cur": "USD", "acvfmt": "$104,808", "agents": 130, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Tyler Walker", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000Lg0abIAB/view"}, {"id": "0063n000010Dx2BAAS", "account": "EL PASO WATER UTILITIES", "group": "EL PASO WATER UTILITIES", "name": "El Paso Water Utilities- Multi-ACD", "type": "New OCR Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2024-06-27", "acv": 31922.4, "cur": "USD", "acvfmt": "$31,922", "agents": 50, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Lance Johnson", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/0063n000010Dx2BAAS/view"}, {"id": "0063n0000120KE3AAM", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "group": "NATIONAL GRID", "name": "National Grid Attached CXone OPEN CISCO Analytics Quality  2000  Agents Attached Oppty 3 of 3", "type": "New Logo", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2023-12-29", "acv": 1566267.48, "cur": "USD", "acvfmt": "$1,566,267", "agents": 2000, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Dave Smith", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/0063n0000120KE3AAM/view"}, {"id": "006Ui00002JQIdFIAX", "account": "OneMain Financial", "group": "OneMain Financial", "name": "OneMain Financial - Amendment 11", "type": "Addendum", "integ": ["SmartReach"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2026-05-20", "acv": 0, "cur": "USD", "acvfmt": "$0", "agents": "\u2014", "region": "Americas", "golive": "TBD", "golivecat": "TBD", "owner": "Luke Johnson", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00002JQIdFIAX/view"}, {"id": "006Ui00001FlFCAIA3", "account": "ACCURATE BACKGROUND", "group": "Accurate Background, LLC", "name": "Accurate Background | CXone QMA | 200", "type": "Exst. Customer / New LOB", "integ": ["Ticketing"], "hub": "Offline", "hubcolor": "#36EAD0", "close": "2025-08-15", "acv": 0, "cur": "USD", "acvfmt": "$0", "agents": 200, "region": "\u2014", "golive": "Delayed \u2192 2026-12-31", "golivecat": "Delayed", "owner": "Emily Gray", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001FlFCAIA3/view"}, {"id": "006Ui00000uEyNRIA0", "account": "BANK OF THE SIERRA", "group": "Sierra Bancorp", "name": "Bank of the Sierra | 2024 Uptivity Campaign | 30", "type": "Exst. Customer / Cloud conversion", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-04-25", "acv": 0, "cur": "USD", "acvfmt": "$0", "agents": 30, "region": "\u2014", "golive": "Delayed \u2192 2026-07-17", "golivecat": "Delayed", "owner": "Kalie Phillipy", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00000uEyNRIA0/view"}, {"id": "006Ui00001AmVpfIAF", "account": "NUTRIEN US LLC", "group": "Nutrien Ltd.", "name": "Nutrien US LLC | Amendment | Uptivity Displacement", "type": "Exst. Customer / New LOB", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-05-16", "acv": 0, "cur": "USD", "acvfmt": "$0", "agents": 100, "region": "\u2014", "golive": "Live", "golivecat": "Live", "owner": "Julie Henderson", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Ui00001AmVpfIAF/view"}, {"id": "006Hu00001XhMB1IAN", "account": "OPTUMRX", "group": "UNITEDHEALTH GROUP INCORPORATED", "name": "UHG - Optum RX Uptivity Migration 450", "type": "Addendum", "integ": [], "hub": "Real-Time", "hubcolor": "#3694FC", "close": "2025-06-30", "acv": 246690, "cur": "USD", "acvfmt": "$246,690", "agents": 720, "region": "Americas", "golive": "Live", "golivecat": "Live", "owner": "Amy Wiesenmayer", "url": "https://niceincontact.lightning.force.com/lightning/r/Opportunity/006Hu00001XhMB1IAN/view"}];
-const GROUP_ORDER=["INTUIT INC", "OneMain Financial", "NATIONAL GRID", "SHARP HEALTHCARE", "Makes Cents Inc.", "THE AUTOMOBILE ASSOCIATION LIMITED", "Northwestern Memorial Healthcare", "Kryterion", "Spire Inc.", "MERCY HEALTH", "ASSOCIATION OF CHARTERED ACCOUNTANTS", "GOUVERNEMENT DE LA PROVINCE DE QUEBEC", "SKIPTON BUILDING SOCIETY", "United Faith Ministries, Inc.", "TELEPHONE AND DATA SYSTEMS, INC.", "Payward, Inc.", "WNS (HOLDINGS) LTD", "THE TORONTO-DOMINION BANK", "Accurate Background, LLC", "AGEAS INSURANCE INTERNATIONAL", "UNITEDHEALTH GROUP INCORPORATED", "LOWE'S COMPANIES, INC.", "METLIFE, INC.", "Nutrien Ltd.", "Phelps County Regional Medical Center", "Sierra Bancorp", "CONTINENTAL AG", "REGIONS FINANCIAL CORPORATION", "AMERICAN NATIONAL INSURANCE COMPANY", "Lifeline of Canada Holdings Ltd", "St. Luke's Health System, Ltd.", "INTEGRATED CARE 24 LIMITED", "AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED", "Healthcare Partners", "EL PASO WATER UTILITIES"];
-const ICOLORS={"SmartReach": "#FF8C42", "Ticketing": "#8E5BD9", "AMC": "#34A853"};
-async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
-async function checkPw(){const v=document.getElementById('pw').value;const h=await sha256(v);if(h===PWHASH){localStorage.setItem('ehub_auth',PWHASH);show();}else{document.getElementById('pwerr').textContent='Incorrect password';}}
-function show(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';render();}
-if(localStorage.getItem('ehub_auth')===PWHASH){show();}
-document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')checkPw();});
+var PW_HASH = "fa34e5bac87849343e48ccec9965e86629502a7f0c7c9f1e18abaa8a2240e673";
+async function sha256(s){
+  var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function unlock(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+async function tryPw(){
+  var v = document.getElementById('pw').value;
+  var h = await sha256(v);
+  if(h===PW_HASH){ localStorage.setItem('ehub_ok', h); unlock(); }
+  else { document.getElementById('err').textContent='Incorrect password'; }
+}
+document.getElementById('go').addEventListener('click', tryPw);
+document.getElementById('pw').addEventListener('keydown', function(e){ if(e.key==='Enter') tryPw(); });
+if(localStorage.getItem('ehub_ok')===PW_HASH){ unlock(); }
 
-let sortCol=null, sortDir=1;
-function sortBy(c){if(sortCol===c){sortDir*=-1;}else{sortCol=c;sortDir=1;}render();}
-function glClass(c){return {Live:'gl-live',Delayed:'gl-del',ETA:'gl-eta',TBD:'gl-tbd'}[c]||'gl-tbd';}
-function hubBadge(r){return '<span class="badge" style="background:'+r.hubcolor+'">'+r.hub+'</span>';}
-function integBadge(arr){return arr.map(i=>'<span class="ibadge" style="background:'+(ICOLORS[i]||'#777')+'">'+i+'</span>').join('')||'';}
-function dealCells(r,showAcct){
-  return '<td>'+(showAcct?r.account:'')+'</td>'+
-    '<td><a href="'+r.url+'" target="_blank">'+r.name+'</a></td>'+
-    '<td>'+r.type+'</td>'+'<td>'+integBadge(r.integ)+'</td>'+'<td>'+hubBadge(r)+'</td>'+
-    '<td>'+r.close+'</td>'+'<td class="acv">'+r.acvfmt+'</td>'+'<td>'+r.agents+'</td>'+
-    '<td>'+r.region+'</td>'+'<td><span class="badge '+glClass(r.golivecat)+'">'+r.golive+'</span></td>'+
-    '<td>'+r.owner+'</td>';
+// ---- filtering ----
+var tb = document.getElementById('tb');
+function applyFilters(){
+  var q = document.getElementById('search').value.toLowerCase();
+  var fr = document.getElementById('fRegion').value;
+  var fh = document.getElementById('fHub').value;
+  var fg = document.getElementById('fGl').value;
+  var rows = tb.querySelectorAll('tr.deal');
+  var visibleByGroup = {};
+  var curGroup = null;
+  tb.querySelectorAll('tr').forEach(function(tr){
+    if(tr.classList.contains('grp')){ curGroup = tr; visibleByGroup[tr.rowIndex]=0; tr._gid=tr.rowIndex; tr._last=true; }
+  });
+  // simpler: iterate sequentially tracking current group header
+  var grp=null, grpCount=0;
+  Array.prototype.forEach.call(tb.children, function(tr){
+    if(tr.classList.contains('grp')){
+      if(grp) grp.style.display = grpCount>0 ? '' : 'none';
+      grp=tr; grpCount=0; return;
+    }
+    var ok=true;
+    if(q){ var hay=(tr.dataset.acct+' '+tr.dataset.name).toLowerCase(); ok = hay.indexOf(q)>=0; }
+    if(ok && fr) ok = tr.dataset.region===fr;
+    if(ok && fh) ok = tr.dataset.hub===fh;
+    if(ok && fg) ok = tr.dataset.gl===fg.toLowerCase();
+    tr.style.display = ok ? '' : 'none';
+    if(ok) grpCount++;
+  });
+  if(grp) grp.style.display = grpCount>0 ? '' : 'none';
 }
-function filtered(){
-  const q=document.getElementById('search').value.toLowerCase();
-  const reg=document.getElementById('fregion').value, hub=document.getElementById('fhub').value, gl=document.getElementById('fgl').value;
-  return ROWS.filter(r=>(!q||r.account.toLowerCase().includes(q)||r.name.toLowerCase().includes(q))
-    &&(!reg||r.region===reg)&&(!hub||r.hub===hub)&&(!gl||r.golivecat===gl));
-}
-function render(){
-  document.querySelectorAll('.sortind').forEach(e=>e.textContent='');
-  if(sortCol){const ind=document.querySelector('.sortind[data-c="'+sortCol+'"]');if(ind)ind.textContent=sortDir>0?'▲':'▼';}
-  const data=filtered();
-  const tb=document.getElementById('tbody');let h='';
-  const accts=new Set(data.map(r=>r.group));
-  if(sortCol){
-    const s=[...data].sort((a,b)=>{let x=a[sortCol],y=b[sortCol];
-      if(sortCol==='acv'||sortCol==='agents'){x=parseFloat(x)||0;y=parseFloat(y)||0;}
-      else if(sortCol==='integ'){x=a.integ.join(',');y=b.integ.join(',');}
-      else{x=(''+x).toLowerCase();y=(''+y).toLowerCase();}
-      return x<y?-1*sortDir:x>y?sortDir:0;});
-    s.forEach(r=>{h+='<tr>'+dealCells(r,true)+'</tr>';});
-  }else{
-    GROUP_ORDER.forEach(g=>{
-      const gr=data.filter(r=>r.group===g);if(!gr.length)return;
-      gr.sort((a,b)=>a.close<b.close?1:-1);
-      const tot=gr.reduce((s,r)=>s+(r.cur==='USD'?r.acv:0),0);
-      h+='<tr class="grp"><td colspan="11">'+g+' — '+gr.length+' deal'+(gr.length>1?'s':'')+' · $'+tot.toLocaleString(undefined,{maximumFractionDigits:0})+' USD ACV</td></tr>';
-      gr.forEach(r=>{h+='<tr>'+dealCells(r,false)+'</tr>';});
-    });
+['search','fRegion','fHub','fGl'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', applyFilters);
+});
+
+// ---- sorting ----
+var sortState={k:null,dir:1};
+var glRank={live:0,delayed:1,eta:2,tbd:3};
+function cellVal(tr,k){
+  switch(k){
+    case 'acct': return tr.dataset.acct.toLowerCase();
+    case 'name': return tr.dataset.name.toLowerCase();
+    case 'region': return tr.dataset.region.toLowerCase();
+    case 'hub': return tr.dataset.hub.toLowerCase();
+    case 'gl': return glRank[tr.dataset.gl];
+    case 'type': return tr.cells[2].innerText.toLowerCase();
+    case 'integ': return tr.cells[3].innerText.trim().toLowerCase();
+    case 'close': return tr.cells[5].innerText;
+    case 'acv': return parseFloat(tr.cells[6].innerText.replace(/[^0-9.]/g,''))||0;
+    case 'agents': var a=tr.cells[7].innerText.trim(); return a==='—'?-1:parseFloat(a);
+    case 'owner': return tr.cells[10].innerText.toLowerCase();
   }
-  if(!h)h='<tr><td colspan="11" style="text-align:center;padding:24px;color:#999">No matching deals</td></tr>';
-  tb.innerHTML=h;
-  document.getElementById('count').textContent=data.length+' deals · '+accts.size+' accounts';
+  return '';
 }
+function sortBy(k){
+  if(sortState.k===k) sortState.dir*=-1; else {sortState.k=k;sortState.dir=1;}
+  var deals = Array.prototype.filter.call(tb.children, t=>t.classList.contains('deal'));
+  deals.sort(function(a,b){
+    var va=cellVal(a,k), vb=cellVal(b,k);
+    if(va<vb) return -1*sortState.dir;
+    if(va>vb) return 1*sortState.dir;
+    return 0;
+  });
+  // flatten: hide group headers, append sorted deals
+  Array.prototype.forEach.call(tb.querySelectorAll('tr.grp'), function(g){g.style.display='none';});
+  deals.forEach(function(d){ tb.appendChild(d); });
+  document.querySelectorAll('th .ar').forEach(s=>s.textContent='');
+  var th=document.querySelector('th[data-k="'+k+'"] .ar');
+  if(th) th.textContent = sortState.dir>0 ? '▲' : '▼';
+  applyFilters();
+}
+document.querySelectorAll('th').forEach(function(th){
+  th.addEventListener('click', function(){ sortBy(th.dataset.k); });
+});
 </script>
-</body></html>
+</body>
+</html>
