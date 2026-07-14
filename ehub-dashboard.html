@@ -1039,8 +1039,8 @@ function render() {
     };
   } else {
     groups.sort((a,b) => {
-      const ma = Math.max(...a[1].map(d => d.close_date));
-      const mb = Math.max(...b[1].map(d => d.close_date));
+      const ma = a[1].reduce((acc, d) => d.close_date > acc ? d.close_date : acc, '');
+      const mb = b[1].reduce((acc, d) => d.close_date > acc ? d.close_date : acc, '');
       return mb.localeCompare(ma);
     });
   }
@@ -1052,7 +1052,7 @@ function render() {
   
   let rows = '';
   for (const [gname, gdls] of groups) {
-    const maxClose = Math.max(...gdls.map(d => d.close_date));
+    const maxClose = gdls.reduce((acc, d) => d.close_date > acc ? d.close_date : acc, '');
     rows += `<tr class="group-row"><td colspan="11">▸ ${gname} (${gdls.length} deal${gdls.length>1?'s':''})</td></tr>`;
     for (const d of gdls) {
       const sf_url = `https://niceincontact.lightning.force.com/lightning/r/Opportunity/${d.id}/view`;
