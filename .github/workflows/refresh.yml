@@ -1,0 +1,38 @@
+name: Refresh eHub Dashboard
+
+on:
+  schedule:
+    # 06:00 UTC daily (09:00 Israel time)
+    - cron: "0 6 * * *"
+  workflow_dispatch: # allow manual trigger from the Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r generate/requirements.txt
+
+      - name: Generate dashboard
+        env:
+          SF_USERNAME:        ${{ secrets.SF_USERNAME }}
+          SF_PASSWORD:        ${{ secrets.SF_PASSWORD }}
+          SF_SECURITY_TOKEN:  ${{ secrets.SF_SECURITY_TOKEN }}
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: python generate/generate.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ehub-dashboard.html
+          # only commit if the file actually changed
+          git diff --cached --quiet || git commit -m "data refresh $(date -u +%Y-%m-%d)"
+          git push
