@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eHub Closed Won Dashboard</title>
+<style>
+:root{--blue:#3694FC;--charcoal:#21212B;}
+*{box-sizing:border-box;} body{margin:0;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--charcoal);background:#f4f6fa;}
+#gate{position:fixed;inset:0;background:var(--charcoal);display:flex;align-items:center;justify-content:center;z-index:100;}
+#gate .box{background:#fff;padding:40px;border-radius:12px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3);}
+#gate h2{margin:0 0 8px;} #gate input{padding:10px 14px;border:1px solid #ccc;border-radius:6px;font-size:15px;width:220px;}
+#gate button{margin-top:14px;padding:10px 24px;background:var(--blue);color:#fff;border:0;border-radius:6px;font-size:15px;cursor:pointer;display:block;width:100%;}
+#gate .err{color:#FF5B8A;font-size:13px;height:16px;margin-top:8px;}
+#app{display:none;max-width:1500px;margin:0 auto;padding:20px;}
+header h1{margin:0;font-size:24px;color:var(--charcoal);}
+.banner{background:#FFF6D6;border:1px solid #F2D98A;color:#7a5c00;padding:10px 16px;border-radius:8px;margin:14px 0;font-size:14px;}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0;}
+.kpi{background:#fff;border-radius:10px;padding:16px 20px;flex:1;min-width:130px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.kpi .v{font-size:26px;font-weight:700;color:var(--blue);} .kpi .l{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px;}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;align-items:center;}
+.filters input,.filters select{padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:14px;}
+.filters input[type=text]{min-width:260px;}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+th,td{padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid #eef1f5;}
+th{background:var(--charcoal);color:#fff;cursor:pointer;user-select:none;white-space:nowrap;}
+th:hover{background:#2f2f3d;}
+tr.grp td{background:#e8eef7;font-weight:700;color:var(--charcoal);font-size:13px;}
+td a{color:var(--blue);text-decoration:none;} td a:hover{text-decoration:underline;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;font-size:11px;font-weight:600;margin-right:4px;}
+.gl-live{color:#1a9e5f;font-weight:600;} .gl-delayed{color:#FF5B8A;font-weight:600;}
+.gl-eta{color:var(--blue);font-weight:600;} .gl-tbd{color:#999;}
+.hub{display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;font-size:11px;font-weight:600;}
+</style></head><body>
+<div id="gate"><div class="box"><h2>eHub Dashboard</h2><div style="font-size:13px;color:#666;margin-bottom:14px;">Enter password</div>
+<input type="password" id="pw" onkeydown="if(event.key==='Enter')check()"><div class="err" id="err"></div>
+<button onclick="check()">Unlock</button></div></div>
+<div id="app">
+<header><h1>eHub Closed Won — Deal Dashboard</h1></header>
+<div class="banner">Dashboard generated on %%DATE%% — data reflects Salesforce as of that date.</div>
+<div class="kpis" id="kpis"></div>
+<div class="filters">
+<input type="text" id="search" placeholder="Search account or deal name..." oninput="render()">
+<select id="region" onchange="render()"><option value="">All Regions</option></select>
+<select id="hub" onchange="render()"><option value="">All Hub Types</option><option>Real-Time</option><option>Offline</option><option>RT + Offline</option></select>
+<select id="status" onchange="render()"><option value="">All Go-Live</option><option>Live</option><option>Delayed</option><option>ETA</option><option>TBD</option></select>
+</div>
+<table id="tbl"><thead><tr>
+<th onclick="sortBy('acct')">Account</th><th onclick="sortBy('name')">Deal Name</th>
+<th onclick="sortBy('type')">Type</th><th>Integration</th><th onclick="sortBy('hub')">Hub</th>
+<th onclick="sortBy('close')">Close Date</th><th onclick="sortBy('acv')">ACV</th>
+<th onclick="sortBy('agents')">Agents</th><th onclick="sortBy('region')">Region</th>
+<th onclick="sortBy('glsort')">Go-Live</th><th onclick="sortBy('owner')">Owner</th>
+</tr></thead><tbody id="tb"></tbody></table>
+</div>
+<script>
+const PW_HASH="%%PW_HASH%%";
+const DATA=%%DATA%%;
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function check(){const v=document.getElementById('pw').value;const h=await sha256(v);if(h===PW_HASH){localStorage.setItem('ehub_ok','1');show();}else{document.getElementById('err').textContent='Incorrect password';}}
+function show(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';init();}
+if(localStorage.getItem('ehub_ok')==='1'){window.addEventListener('DOMContentLoaded',show);}
+let sortKey='glsort',sortDir=1;
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();}
+function init(){
+ const regs=[...new Set(DATA.rows.map(r=>r.region).filter(x=>x))].sort();
+ const rs=document.getElementById('region');regs.forEach(r=>{const o=document.createElement('option');o.textContent=r;rs.appendChild(o);});
+ const total=DATA.rows.length;
+ const live=DATA.rows.filter(r=>r.glcls==='gl-live').length;
+ const delayed=DATA.rows.filter(r=>r.glcls==='gl-delayed').length;
+ const eta=DATA.rows.filter(r=>r.glcls==='gl-eta').length;
+ const tbd=DATA.rows.filter(r=>r.glcls==='gl-tbd').length;
+ const usdAcv=DATA.rows.filter(r=>r.cur==='USD').reduce((s,r)=>s+(r.acv||0),0);
+ const kpis=document.getElementById('kpis');
+ kpis.innerHTML=
+  '<div class="kpi"><div class="v">'+total+'</div><div class="l">Total Deals</div></div>'+
+  '<div class="kpi"><div class="v">$'+Math.round(usdAcv).toLocaleString()+'</div><div class="l">USD ACV</div></div>'+
+  '<div class="kpi"><div class="v">'+live+'</div><div class="l">Live</div></div>'+
+  '<div class="kpi"><div class="v">'+delayed+'</div><div class="l">Delayed</div></div>'+
+  '<div class="kpi"><div class="v">'+eta+'</div><div class="l">ETA</div></div>'+
+  '<div class="kpi"><div class="v">'+tbd+'</div><div class="l">TBD</div></div>';
+ render();
+}
+function fmtACV(r){return r.cur+' '+(r.acv?r.acv.toLocaleString(undefined,{maximumFractionDigits:0}):'0');}
+function glCategory(r){if(r.glcls==='gl-live')return 'Live';if(r.glcls==='gl-delayed')return 'Delayed';if(r.glcls==='gl-eta')return 'ETA';return 'TBD';}
+function render(){
+ const q=document.getElementById('search').value.toLowerCase();
+ const fr=document.getElementById('region').value,fh=document.getElementById('hub').value,fs=document.getElementById('status').value;
+ let rows=DATA.rows.filter(r=>{
+   if(q&&!(r.acct.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)))return false;
+   if(fr&&r.region!==fr)return false;
+   if(fh&&r.hub!==fh)return false;
+   if(fs&&glCategory(r)!==fs)return false;
+   return true;
+ });
+ rows.sort((a,b)=>{
+   let x,y;
+   if(sortKey==='glsort'){
+     const rank=r=>r.glcls==='gl-live'?0:(r.glcls==='gl-tbd'?2:1);
+     const ra=rank(a),rb=rank(b);
+     if(ra!==rb)return ra-rb;
+     if(ra===1){x=a.glsort||'9999';y=b.glsort||'9999';return x<y?-1:x>y?1:0;}
+     return 0;
+   }
+   x=a[sortKey];y=b[sortKey];
+   if(sortKey==='acv'||sortKey==='agents'){x=x||0;y=y||0;return (x-y)*sortDir;}
+   x=(x||'').toString().toLowerCase();y=(y||'').toString().toLowerCase();
+   return (x<y?-1:x>y?1:0)*sortDir;
+ });
+ const groups={};rows.forEach(r=>{(groups[r.group]=groups[r.group]||[]).push(r);});
+ const gorder=Object.keys(groups).sort((a,b)=>DATA.grp_recent[b].localeCompare(DATA.grp_recent[a]));
+ const tb=document.getElementById('tb');tb.innerHTML='';
+ if(rows.length===0){tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:30px;color:#999;">No deals match filters</td></tr>';return;}
+ gorder.forEach(g=>{
+   const tr=document.createElement('tr');tr.className='grp';
+   tr.innerHTML='<td colspan="11">'+esc(g)+' \u00b7 '+groups[g].length+' deal(s)</td>';tb.appendChild(tr);
+   groups[g].forEach(r=>{
+     const integ=r.integ.map(i=>'<span class="badge" style="background:'+i[1]+'">'+i[0]+'</span>').join('');
+     const tr2=document.createElement('tr');
+     tr2.innerHTML='<td>'+esc(r.acct)+'</td>'+
+      '<td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/'+r.id+'/view" target="_blank">'+esc(r.name)+'</a></td>'+
+      '<td>'+esc(r.type)+'</td><td>'+integ+'</td>'+
+      '<td><span class="hub" style="background:'+r.hubcolor+'">'+r.hub+'</span></td>'+
+      '<td>'+r.close+'</td><td>'+fmtACV(r)+'</td>'+
+      '<td>'+(r.agents!=null?r.agents:'')+'</td><td>'+esc(r.region)+'</td>'+
+      '<td class="'+r.glcls+'">'+esc(r.gl)+'</td><td>'+esc(r.owner)+'</td>';
+     tb.appendChild(tr2);
+   });
+ });
+}
+function esc(s){return (s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+</script></body></html>

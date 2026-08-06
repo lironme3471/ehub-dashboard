@@ -1,0 +1,48 @@
+eHub Dashboard — Data Refresh & Deploy Checklist
+=================================================
+
+Run this checklist every time you publish a new snapshot.
+
+--- SETUP (one-time) ---
+[ ] cd generate
+[ ] python -m venv .venv && source .venv/bin/activate
+[ ] pip install -r requirements.txt
+[ ] cp .env.example .env
+[ ] Fill SFDC_USERNAME, SFDC_PASSWORD, SFDC_TOKEN, DASHBOARD_PASSWORD in .env
+
+--- BEFORE EACH RUN ---
+[ ] Confirm Salesforce is not in a maintenance window
+[ ] Confirm you are querying the correct org (production vs sandbox)
+    SFDC_DOMAIN=login  → production
+    SFDC_DOMAIN=test   → sandbox
+
+--- DATA REFRESH ---
+[ ] python generate.py
+[ ] Check terminal output:
+      - No auth errors
+      - Deal count looks reasonable (compare to last run)
+      - Live / Delayed / ETA / TBD counts look plausible
+
+--- SANITY CHECKS (browser) ---
+[ ] Open ../ehub-dashboard.html in browser
+[ ] Unlock with DASHBOARD_PASSWORD — gate should clear
+[ ] KPI totals match terminal output
+[ ] Spot-check 2-3 deals: Salesforce URL in deal name link opens the correct record
+[ ] Spot-check 1-2 go-live statuses against Salesforce or PM tracker
+[ ] Filter by region, hub type, and status — results look correct
+[ ] No blank / garbled account names or dates
+
+--- CANDIDATE DETECTION ---
+[ ] Any deal showing "Delayed" with a very old date? Flag for PM follow-up.
+[ ] Any deal showing "TBD" for 60+ days post close? Flag for owner.
+[ ] New deals since last run? Confirm integration type and hub type are set.
+
+--- DEPLOY ---
+[ ] git -C .. add ehub-dashboard.html
+[ ] git -C .. commit -m "data refresh YYYY-MM-DD"
+[ ] git -C .. push origin main
+[ ] Wait ~30 seconds, then open https://lironme3471.github.io/ehub-dashboard/ehub-dashboard.html
+[ ] Confirm the banner shows today's date
+[ ] Confirm deal count matches terminal output
+
+--- DONE ---
