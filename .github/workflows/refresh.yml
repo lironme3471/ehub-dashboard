@@ -8,17 +8,18 @@ on:
 
 jobs:
   refresh:
-    runs-on: ubuntu-latest
+    # self-hosted runner uses corporate network → Salesforce auth works
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4.2.2
 
-      - uses: actions/setup-python@v5.3.0
-        with:
-          python-version: "3.11"
-
       - name: Install dependencies
-        run: pip install -r generate/requirements.txt
+        run: |
+          cd generate
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
 
       - name: Generate dashboard
         env:
@@ -26,7 +27,9 @@ jobs:
           SF_PASSWORD:        ${{ secrets.SF_PASSWORD }}
           SF_SECURITY_TOKEN:  ${{ secrets.SF_SECURITY_TOKEN }}
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
-        run: python generate/generate.py
+        run: |
+          source generate/.venv/bin/activate
+          python generate/generate.py
 
       - name: Commit and push if changed
         run: |
