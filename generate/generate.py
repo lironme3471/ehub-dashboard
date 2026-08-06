@@ -34,7 +34,7 @@ HERE      = pathlib.Path(__file__).parent
 TEMPLATE  = HERE / "template.html"
 OUTPUT    = HERE.parent / "ehub-dashboard.html"
 TODAY     = datetime.date.today()
-TODAY_STR = TODAY.isoformat()
+TODAY_STR = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
 # ---------------------------------------------------------------------------
 # Static overrides — sourced from copilot-instructions.md Step 2
