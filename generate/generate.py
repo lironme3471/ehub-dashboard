@@ -47,6 +47,13 @@ FORCE_EXCLUDE: set[str] = {
     "006Ui00002ITdIjIAL",  # THE AA internal allocation "DO NOT CONTRACT"
     "006Ui00000pY77IIAS",  # ANZ Bank Australia Cloud Recording split
     "0063n000010m4BwAAI",  # DWP UK Enterprise CCaaS
+    "006Ui00002dbfJJIAY",  # ICS - PROD NEVA — removed per Liron 2026-08-16
+}
+
+# Opportunities whose auto-detected integration badges should be cleared
+# (false positives from the SKU query that Liron has manually corrected).
+FORCE_NO_INTEGRATION: set[str] = {
+    "006Ui00002bNnkrIAC",  # Standard Insurance FedRAMP — generic, not SmartReach (per Liron 2026-08-16)
 }
 
 FORCE_INCLUDE_IDS: list[str] = [
@@ -311,6 +318,8 @@ def _build_row(o, proj, offline_ids, rt_ids, integ_map):
         badges.add("SmartReach")
     if oid in FORCE_TICKETING:
         badges.add("Ticketing")
+    if oid in FORCE_NO_INTEGRATION:
+        badges = set()
     integ = [[b, INTEG_COLORS[b]] for b in sorted(badges) if b in INTEG_COLORS]
 
     gl, glcls, glsort = _classify_gl(
