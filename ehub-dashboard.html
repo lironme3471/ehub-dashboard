@@ -1,351 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>eHub Closed-Won Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eHub Closed Won Dashboard</title>
 <style>
-  :root {
-    --nice-blue: #3694FC;
-    --charcoal: #21212B;
-    --indigo: #6100FF;
-    --teal: #36EAD0;
-    --coral: #FF5B8A;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f4f6fa;
-    color: var(--charcoal);
-  }
-  #gate {
-    position: fixed; inset: 0; background: var(--charcoal);
-    display: flex; align-items: center; justify-content: center; z-index: 999;
-  }
-  #gate .card {
-    background: #fff; border-radius: 12px; padding: 40px 36px; width: 340px;
-    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.4);
-  }
-  #gate h2 { margin: 0 0 6px; color: var(--charcoal); }
-  #gate p { color: #666; font-size: 13px; margin-top: 0; }
-  #gate input {
-    width: 100%; padding: 10px 12px; margin: 14px 0; border-radius: 8px;
-    border: 1px solid #ccc; font-size: 14px;
-  }
-  #gate button {
-    width: 100%; padding: 10px 12px; border: none; border-radius: 8px;
-    background: var(--nice-blue); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
-  }
-  #gate .err { color: var(--coral); font-size: 12px; min-height: 16px; }
-  #app { display: none; padding: 24px; max-width: 1500px; margin: 0 auto; }
-  .banner {
-    background: #FFF3CD; border: 1px solid #FFE69C; color: #664d03;
-    padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 18px;
-  }
-  h1 { font-size: 22px; margin: 0 0 16px; color: var(--charcoal); }
-  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
-  .kpi {
-    background: #fff; border-radius: 10px; padding: 14px; text-align: center;
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  }
-  .kpi .val { font-size: 22px; font-weight: 700; color: var(--nice-blue); }
-  .kpi .lbl { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: .04em; margin-top: 4px;}
-  .kpi.live .val { color: #1a9c5b; }
-  .kpi.delayed .val { color: var(--coral); }
-  .kpi.eta .val { color: var(--nice-blue); }
-  .kpi.tbd .val { color: #888; }
-  .filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
-  .filters input, .filters select {
-    padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px;
-  }
-  .filters input[type=text] { min-width: 240px; }
-  .count { font-size: 12px; color: #666; margin-bottom: 8px; }
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-  th, td { padding: 9px 10px; text-align: left; font-size: 12.5px; border-bottom: 1px solid #eee; }
-  th { background: var(--charcoal); color: #fff; cursor: pointer; user-select: none; white-space: nowrap; }
-  th:hover { background: #33334a; }
-  tr.group-row td { background: #eef3fc; font-weight: 700; cursor: pointer; color: var(--charcoal); }
-  tr.deal-row:hover { background: #f8fafc; }
-  tr.deal-row td.acct-muted { color: #999; font-style: italic; }
-  a.dealname { color: var(--nice-blue); text-decoration: none; font-weight: 600; }
-  a.dealname:hover { text-decoration: underline; }
-  .pill { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #fff; margin-right: 3px; white-space: nowrap; }
-  .hub-offline { background: var(--teal); color: #063b34; }
-  .hub-rt { background: var(--nice-blue); }
-  .hub-both { background: var(--indigo); }
-  .badge-sr { background: #F5821F; }
-  .badge-tk { background: #8A2BE2; }
-  .badge-amc { background: #2E9E4C; }
-  .status-live { color: #1a9c5b; font-weight: 700; }
-  .status-delayed { color: var(--coral); font-weight: 700; }
-  .status-eta { color: var(--nice-blue); font-weight: 700; }
-  .status-tbd { color: #999; font-weight: 700; }
-  .sort-arrow { font-size: 10px; margin-left: 4px; }
-  .noresults { text-align: center; color: #999; padding: 20px; }
-</style>
-</head>
-<body>
-
-<div id="gate">
-  <div class="card">
-    <h2>eHub Dashboard</h2>
-    <p>Enter password to continue</p>
-    <input type="password" id="pwInput" placeholder="Password">
-    <button onclick="checkPw()">Access Dashboard</button>
-    <div class="err" id="pwErr"></div>
-  </div>
-</div>
-
+:root{--blue:#3694FC;--charcoal:#21212B;}
+*{box-sizing:border-box;} body{margin:0;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--charcoal);background:#f4f6fa;}
+#gate{position:fixed;inset:0;background:var(--charcoal);display:flex;align-items:center;justify-content:center;z-index:100;}
+#gate .box{background:#fff;padding:40px;border-radius:12px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3);}
+#gate h2{margin:0 0 8px;} #gate input{padding:10px 14px;border:1px solid #ccc;border-radius:6px;font-size:15px;width:220px;}
+#gate button{margin-top:14px;padding:10px 24px;background:var(--blue);color:#fff;border:0;border-radius:6px;font-size:15px;cursor:pointer;display:block;width:100%;}
+#gate .err{color:#FF5B8A;font-size:13px;height:16px;margin-top:8px;}
+#app{display:none;max-width:1500px;margin:0 auto;padding:20px;}
+header h1{margin:0;font-size:24px;color:var(--charcoal);}
+.banner{background:#FFF6D6;border:1px solid #F2D98A;color:#7a5c00;padding:10px 16px;border-radius:8px;margin:14px 0;font-size:14px;}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0;}
+.kpi{background:#fff;border-radius:10px;padding:16px 20px;flex:1;min-width:130px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.kpi .v{font-size:26px;font-weight:700;color:var(--blue);} .kpi .l{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px;}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;align-items:center;}
+.filters input,.filters select{padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:14px;}
+.filters input[type=text]{min-width:260px;}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+th,td{padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid #eef1f5;}
+th{background:var(--charcoal);color:#fff;cursor:pointer;user-select:none;white-space:nowrap;}
+th:hover{background:#2f2f3d;}
+tr.grp td{background:#e8eef7;font-weight:700;color:var(--charcoal);font-size:13px;}
+td a{color:var(--blue);text-decoration:none;} td a:hover{text-decoration:underline;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;font-size:11px;font-weight:600;margin-right:4px;}
+.gl-live{color:#1a9e5f;font-weight:600;} .gl-delayed{color:#FF5B8A;font-weight:600;}
+.gl-eta{color:var(--blue);font-weight:600;} .gl-tbd{color:#999;}
+.hub{display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;font-size:11px;font-weight:600;}
+</style></head><body>
+<div id="gate"><div class="box"><h2>eHub Dashboard</h2><div style="font-size:13px;color:#666;margin-bottom:14px;">Enter password</div>
+<input type="password" id="pw" onkeydown="if(event.key==='Enter')check()"><div class="err" id="err"></div>
+<button onclick="check()">Unlock</button></div></div>
 <div id="app">
-  <div class="banner">Dashboard generated on August 20, 2026 — data reflects Salesforce as of that date.</div>
-  <h1>eHub Closed-Won Pipeline Dashboard</h1>
-
-  <div class="kpis">
-    <div class="kpi"><div class="val">60</div><div class="lbl">Total Deals</div></div>
-    <div class="kpi"><div class="val">$20,443,299</div><div class="lbl">USD ACV</div></div>
-    <div class="kpi live"><div class="val">31</div><div class="lbl">Live</div></div>
-    <div class="kpi delayed"><div class="val">10</div><div class="lbl">Delayed</div></div>
-    <div class="kpi eta"><div class="val">15</div><div class="lbl">ETA</div></div>
-    <div class="kpi tbd"><div class="val">4</div><div class="lbl">TBD</div></div>
-  </div>
-
-  <div class="filters">
-    <input type="text" id="searchBox" placeholder="Search account or deal name...">
-    <select id="regionFilter"><option value="">All Regions</option></select>
-    <select id="hubFilter"><option value="">All Hub Types</option></select>
-    <select id="statusFilter"><option value="">All Go-Live Statuses</option></select>
-  </div>
-
-  <div class="count" id="countLine"></div>
-
-  <table>
-    <thead>
-      <tr>
-        <th data-col="account">Account</th>
-        <th data-col="name">Deal Name</th>
-        <th data-col="ctype">Type</th>
-        <th data-col="integrations">Integration</th>
-        <th data-col="hub">Hub</th>
-        <th data-col="close">Close Date</th>
-        <th data-col="acv">ACV</th>
-        <th data-col="agents">Agents</th>
-        <th data-col="region">Region</th>
-        <th data-col="golive">Go-Live</th>
-        <th data-col="owner">Owner</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+<header><h1>eHub Closed Won — Deal Dashboard</h1></header>
+<div class="banner">Dashboard generated on 2026-08-22 10:15 (local time) — data reflects Salesforce as of that date.</div>
+<div class="kpis" id="kpis"></div>
+<div class="filters">
+<input type="text" id="search" placeholder="Search account or deal name..." oninput="render()">
+<select id="region" onchange="render()"><option value="">All Regions</option></select>
+<select id="hub" onchange="render()"><option value="">All Hub Types</option><option>Real-Time</option><option>Offline</option><option>RT + Offline</option></select>
+<select id="status" onchange="render()"><option value="">All Go-Live</option><option>Live</option><option>Delayed</option><option>ETA</option><option>TBD</option></select>
 </div>
-
+<table id="tbl"><thead><tr>
+<th onclick="sortBy('acct')">Account</th><th onclick="sortBy('name')">Deal Name</th>
+<th onclick="sortBy('type')">Type</th><th>Integration</th><th onclick="sortBy('hub')">Hub</th>
+<th onclick="sortBy('close')">Close Date</th><th onclick="sortBy('acv')">ACV</th>
+<th onclick="sortBy('agents')">Agents</th><th onclick="sortBy('region')">Region</th>
+<th onclick="sortBy('glsort')">Go-Live</th><th onclick="sortBy('owner')">Owner</th>
+</tr></thead><tbody id="tb"></tbody></table>
+</div>
 <script>
-const DATA = [{"id": "006Ui00002FBhfvIAD", "name": "ONESOURCE VIRTUAL INC |  Amendment  | WFM Prem + QMA Gen AI + IAA", "account": "ONESOURCE VIRTUAL INC", "top_parent": "Onesource Virtual, Inc.", "close": "2026-08-18", "acv": 185904, "currency": "USD", "agents": 210, "region": "Americas", "owner": "Tanner Plowman", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": ["Ticketing"], "golive_status": "TBD", "golive_date": null}, {"id": "006Ui00002bNnkrIAC", "name": "STANDARD INSURANCE COMPANY FEDRAMP |  Amendment  | Engagement Hub", "account": "STANDARD INSURANCE COMPANY FEDRAMP", "top_parent": "MEIJI YASUDA LIFE  INSURANCE COMPANY", "close": "2026-08-14", "acv": 1008, "currency": "USD", "agents": null, "region": "Americas", "owner": "David Young", "ctype": "Exst. Customer / Expansions", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "TBD", "golive_date": null}, {"id": "006Ui00002dbfJJIAY", "name": "ICS \u2013 PROD NEVA |  Amendment  | From Omnichannel to Ultimate Suite+Copilot - Chargable Demo", "account": "ICS \u2013 PROD NEVA", "top_parent": "INTERACTIVE  CAPTURE SYSTEMS", "close": "2026-08-11", "acv": 1474.8, "currency": "USD", "agents": null, "region": "Americas", "owner": "Caitlin Brunson", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "TBD", "golive_date": null}, {"id": "006Ui0000271A0KIAU", "name": "BT - UK - Enterprise - CXone Engagement Hub - Multi-ACD - Production Platform - 18000", "account": "BRITISH TELECOMMUNICATIONS PLC - PM TEST INSTANCE", "top_parent": "BT GROUP PLC ENTERPRISE", "close": "2026-08-07", "acv": 911979.02, "currency": "GBP", "agents": 18000, "region": "International", "owner": "Richard Hawkes", "ctype": "Exst. Customer / Cloud conversion", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-09-01"}, {"id": "006Ui00002CdIJhIAN", "name": "BT UK - Enterprise | CXone | Engagement Hub - Multi-ACD - Pre-Prod Platform", "account": "BRITISH TELECOMMUNICATIONS PLC - PRE-PRODUCTION", "top_parent": "BT GROUP PLC ENTERPRISE", "close": "2026-08-07", "acv": 2305.39, "currency": "GBP", "agents": 18000, "region": "International", "owner": "Richard Hawkes", "ctype": "New Logo", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-09-01"}, {"id": "006Ui00002CdM7BIAV", "name": "BT - UK - Enterprise - CXone Engagement Hub - Multi-ACD - Test Platform", "account": "BRITISH TELECOMMUNICATIONS PLC - PM TEST INSTANCE", "top_parent": "BT GROUP PLC ENTERPRISE", "close": "2026-08-07", "acv": 2305.39, "currency": "GBP", "agents": 18000, "region": "International", "owner": "Richard Hawkes", "ctype": "Exst. Customer / Cloud conversion", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-09-01"}, {"id": "006Ui00002UmVX3IAN", "name": "SKIPTON BUILDING SOCIETY - UK |  Amendment  | 2026-06-10", "account": "SKIPTON BUILDING SOCIETY - UK", "top_parent": "SKIPTON BUILDING SOCIETY", "close": "2026-08-06", "acv": 2880, "currency": "GBP", "agents": 560, "region": "International", "owner": "Steven Lee", "ctype": "Addendum", "hub": "Real-Time", "integrations": [], "golive_status": "Delayed", "golive_date": "2026-08-06"}, {"id": "006Ui00002KscTaIAJ", "name": "MetLife | CXone | Engagement Hub (CC, PbP attached) | 2,500", "account": "METLIFE", "top_parent": "METLIFE, INC.", "close": "2026-07-31", "acv": 470761.56, "currency": "USD", "agents": 200, "region": "Americas", "owner": "Brian Abele", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": [], "golive_status": "ETA", "golive_date": "2027-07-23"}, {"id": "006Ui00002Btqt5IAB", "name": "NELNET ENTERPRISE |  Amendment  | Smartreach recording", "account": "NELNET ENTERPRISE", "top_parent": "NELNET, INC.", "close": "2026-07-29", "acv": 1260, "currency": "USD", "agents": null, "region": "Americas", "owner": "Casey Jones", "ctype": "Addendum", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "ETA", "golive_date": "2027-03-08"}, {"id": "006Ui00002Sw43hIAB", "name": "OPEN NETWORK EXCHANGE |  Amendment  | SmartReach CXone Recording", "account": "OPEN NETWORK EXCHANGE", "top_parent": "Open Network Exchange Inc", "close": "2026-07-22", "acv": 0, "currency": "USD", "agents": 40, "region": "Americas", "owner": "Rick Tirado", "ctype": "Addendum", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001tv9XqIAI", "name": "PUBLIC STORAGE OPERATING COMPANY |  Amendment  | SmartReach", "account": "PUBLIC STORAGE OPERATING COMPANY", "top_parent": "PUBLIC STORAGE", "close": "2026-06-19", "acv": 96595.83, "currency": "USD", "agents": null, "region": "Americas", "owner": "Vanessa Crook", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "ETA", "golive_date": "2026-12-30"}, {"id": "006Ui0000226yLtIAI", "name": "Intuit | CXone | SmartReach | 125", "account": "INTUIT INC", "top_parent": "INTUIT INC", "close": "2026-05-27", "acv": 103598.64, "currency": "USD", "agents": 125, "region": "Americas", "owner": "Wendy Ball", "ctype": "New OCR Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Live", "golive_date": null}, {"id": "006Ui000026cAebIAE", "name": "PT Solutions | Full Scope Quote | CP | Expert | AS | Skyward 2026", "account": "PT SOLUTIONS PHYSICAL THERAPY", "top_parent": "PT Solutions, LLC", "close": "2026-05-22", "acv": 371390.76, "currency": "USD", "agents": 120, "region": "Americas", "owner": "Julie Chiles", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "ETA", "golive_date": "2026-11-27"}, {"id": "006Ui00002JQIdFIAX", "name": "OneMain Financial - Amendment 11 - Engagement Hub License Swap", "account": "OneMain Financial", "top_parent": "OneMain Financial", "close": "2026-05-20", "acv": 0, "currency": "USD", "agents": null, "region": "Americas", "owner": "Luke Johnson", "ctype": "Addendum", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "ETA", "golive_date": "2026-10-08"}, {"id": "006Ui00002Lscb7IAB", "name": "NATIONAL GRID CXOne Recording/QM/Analytics New LOB ICOR Outsource Takeout 100 Agent $74,700 ACV", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "top_parent": "NATIONAL GRID", "close": "2026-05-05", "acv": 74704.8, "currency": "USD", "agents": 100, "region": "Americas", "owner": "Dave Smith", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "TBD", "golive_date": null}, {"id": "006Ui000029nDfRIAU", "name": "Sharp | Interaction Hub Migrated Calls", "account": "SHARP HEALTHCARE", "top_parent": "SHARP HEALTHCARE", "close": "2026-04-30", "acv": 264720, "currency": "USD", "agents": 500, "region": "Americas", "owner": "Noa Nightingale", "ctype": "New OCR Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "ETA", "golive_date": "2026-09-14"}, {"id": "006Ui00002H5zzQIAR", "name": "Makes Cents | NiCE CXone SmartReach 35", "account": "MAKES CENTS INC.", "top_parent": "Makes Cents Inc.", "close": "2026-04-23", "acv": 210828.48, "currency": "USD", "agents": 35, "region": "Americas", "owner": "TeeJay Johnson", "ctype": "New Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Delayed", "golive_date": "2026-09-21"}, {"id": "006Ui00001iMFxqIAG", "name": "the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config", "account": "THE AA", "top_parent": "THE AUTOMOBILE ASSOCIATION LIMITED", "close": "2026-03-31", "acv": 2166666.72, "currency": "GBP", "agents": 2345, "region": "International", "owner": "Ian O'Farrell", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "Delayed", "golive_date": "2027-02-26"}, {"id": "006Ui00001oDCinIAG", "name": "NORTHWESTERN MEMORIAL HEALTHCARE |  Amendment  | Engagement Hub and Screen Recording Advanced", "account": "NORTHWESTERN MEMORIAL HEALTHCARE", "top_parent": "Northwestern Memorial Healthcare", "close": "2026-03-24", "acv": 58417.2, "currency": "USD", "agents": null, "region": "Americas", "owner": "Kyler Wilson", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "Delayed", "golive_date": "2026-07-31"}, {"id": "006Ui00001wt5upIAA", "name": "Kryterion | Multi-ACD | QMA | WFM | 210", "account": "KRYTERION", "top_parent": "Kryterion", "close": "2026-03-20", "acv": 65724.02, "currency": "USD", "agents": 200, "region": "Americas", "owner": "Scott Steinert", "ctype": "New Logo", "hub": "Offline", "integrations": ["SmartReach", "Ticketing"], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001BopzlIAB", "name": "Spire Energy | Accenture | CXone | 500", "account": "SPIRE", "top_parent": "Spire Inc.", "close": "2026-01-20", "acv": 1432109.47, "currency": "USD", "agents": 500, "region": "Americas", "owner": "Jason Cates", "ctype": "New Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Delayed", "golive_date": "2026-10-15"}, {"id": "006Ui00001waBEMIA2", "name": "WNS Multi ACD - Third BU London 1150 Licenses", "account": "WNS INDIA LTD- MULTI ACD LONDON BU", "top_parent": "WNS (HOLDINGS) LTD", "close": "2026-01-08", "acv": 0, "currency": "USD", "agents": 1150, "region": "International", "owner": "Mayur Jorapur", "ctype": "Exst. Customer / Cloud conversion", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001DqtztIAB", "name": "Mercy | Recording Upgrade | Multi-ACD | 1025", "account": "MERCY HEALTH", "top_parent": "MERCY HEALTH", "close": "2025-12-31", "acv": 537757.5, "currency": "USD", "agents": 2300, "region": "Americas", "owner": "AJ Fasano", "ctype": "Exst. Customer / Cloud conversion", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001cVjNRIA0", "name": "ACCA | SVL | CXone | Hub | 150", "account": "ACCA", "top_parent": "ASSOCIATION OF CHARTERED ACCOUNTANTS", "close": "2025-12-24", "acv": 44730, "currency": "GBP", "agents": 150, "region": "International", "owner": "Joshua Hendon", "ctype": "Exst. Customer / New BU", "hub": "Real-Time", "integrations": [], "golive_status": "Delayed", "golive_date": "2026-10-08"}, {"id": "006Ui00001kd7Q1IAI", "name": "FRESENIUS MEDICAL CARE | RCM | Direct Conversion | WFMA, QMA, IAA, AutoSummary, Actions, EvalSummary, SmartReach | #7/13", "account": "FRESENIUS PLANO TX", "top_parent": "Fresenius SE & Co. KGaA", "close": "2025-12-24", "acv": 186692.4, "currency": "USD", "agents": 120, "region": "Americas", "owner": "Charles Scheid", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Live", "golive_date": null}, {"id": "006Hu00001V4FujIAF", "name": "Revenu Quebec - CXone Multi ACD for CMS with QM for 2000", "account": "MINISTERE DU REVENU DU QUEBEC", "top_parent": "GOUVERNEMENT DE LA PROVINCE DE QUEBEC", "close": "2025-12-23", "acv": 587691.91, "currency": "CAD", "agents": 1800, "region": "Americas", "owner": "Ian Gillman", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-09-14"}, {"id": "006Ui00001f4ZVJIA2", "name": "Teams recording solution", "account": "SKIPTON BUILDING SOCIETY - UK", "top_parent": "SKIPTON BUILDING SOCIETY", "close": "2025-12-19", "acv": 34692.96, "currency": "GBP", "agents": 410, "region": null, "owner": "Steven Lee", "ctype": "New OCR Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001eiPHjIAM", "name": "UHSM | CXone | Suite | 130 Agents", "account": "UHSM", "top_parent": "United Faith Ministries, Inc.", "close": "2025-11-25", "acv": 390768.84, "currency": "USD", "agents": 145, "region": null, "owner": "Jesse DiCocco", "ctype": "New Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "ETA", "golive_date": "2026-08-28"}, {"id": "006Ui00000vVOQDIA4", "name": "TDS Telecom | CXone, Enlighten | 1100", "account": "TDS TELECOM", "top_parent": "TELEPHONE AND DATA SYSTEMS, INC.", "close": "2025-11-17", "acv": 1415003.8, "currency": "USD", "agents": 1100, "region": "Americas", "owner": "Todd Brown", "ctype": "New Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Delayed", "golive_date": "2028-01-19"}, {"id": "006Ui00000GdYi9IAF", "name": "TD Bank Financial Group - Pre prod environment (Cap 50 users)", "account": "TD BANK", "top_parent": "THE TORONTO-DOMINION BANK", "close": "2025-10-31", "acv": 0, "currency": "CAD", "agents": null, "region": "Americas", "owner": "Neil Balthazaar", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000rHB6zIAG", "name": "TD Bank Financial Group | CXone Multi ACD | 450 Pilot", "account": "THE TORONTO-DOMINION BANK US WEST", "top_parent": "THE TORONTO-DOMINION BANK", "close": "2025-10-31", "acv": 0, "currency": "CAD", "agents": 1000, "region": "Americas", "owner": "Neil Balthazaar", "ctype": "Exst. Customer / Expansions", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001K1hWjIAJ", "name": "Kraken - 2025 Playvox QM Campaign (Project Catalyst)", "account": "PAYWARD, INC.", "top_parent": "Payward, Inc.", "close": "2025-10-22", "acv": 11520, "currency": "USD", "agents": 60, "region": "Americas", "owner": "Ali Cazel", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": ["Ticketing"], "golive_status": "Live", "golive_date": null}, {"id": "0063n000011zsc1AAA", "name": "TD Bank Financial Group - CXone Multi ACD - Verint Takeout", "account": "THE TORONTO-DOMINION BANK US WEST", "top_parent": "THE TORONTO-DOMINION BANK", "close": "2025-09-26", "acv": 3718700.67, "currency": "CAD", "agents": null, "region": "Americas", "owner": "Neil Balthazaar", "ctype": "Addendum", "hub": "Offline", "integrations": [], "golive_status": "Delayed", "golive_date": "2026-11-27"}, {"id": "006Ui00001HUFljIAH", "name": "WNS On Prem to Cloud (Multi ACD) Tokyo BU", "account": "WNS GLOBAL SERVICES - TOKYO BU", "top_parent": "WNS (HOLDINGS) LTD", "close": "2025-09-26", "acv": 304352.28, "currency": "USD", "agents": null, "region": "International", "owner": "Mayur Jorapur", "ctype": "Exst. Customer / New BU", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001jQGbVIAW", "name": "WNS On Prem to Cloud (Multi ACD) US BU 200", "account": "WNS GLOBAL SERVICES - INDIA HQ", "top_parent": "WNS (HOLDINGS) LTD", "close": "2025-09-26", "acv": 28966.32, "currency": "USD", "agents": 200, "region": "International", "owner": "Mayur Jorapur", "ctype": "Exst. Customer / New BU", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001hh2wXIAQ", "name": "NATIONAL GRID USA SERVICE COMPANY INC New LOB  400 Agent Add", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "top_parent": "NATIONAL GRID", "close": "2025-09-23", "acv": 298800, "currency": "USD", "agents": 400, "region": "Americas", "owner": "Dave Smith", "ctype": "Exst. Customer / Expansions", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001FlFCAIA3", "name": "Accurate Background | CXone QMA - 2025 Playvox QM Campaign", "account": "ACCURATE BACKGROUND", "top_parent": "Accurate Background, LLC", "close": "2025-08-15", "acv": 0, "currency": "USD", "agents": 200, "region": null, "owner": "Emily Gray", "ctype": "Exst. Customer / New LOB", "hub": "Offline", "integrations": ["Ticketing"], "golive_status": "Delayed", "golive_date": "2026-12-31"}, {"id": "0063n000010laAfAAI", "name": "Ford Motor -RFP | CXone Suite + Digital -- (Cisco UCCE Displacement) -Skyward", "account": "FORD MOTOR COMPANY - ENTERPRISE", "top_parent": "FORD MOTOR COMPANY", "close": "2025-07-30", "acv": 9986750.69, "currency": "USD", "agents": 5000, "region": "Americas", "owner": "Ben Tootle", "ctype": "New OCR Logo", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Live", "golive_date": null}, {"id": "006Hu00001XhMB1IAN", "name": "UHG - Optum RX Uptivity Migration to CXone MultiACD & QM 450", "account": "OPTUMRX", "top_parent": "UNITEDHEALTH GROUP INCORPORATED", "close": "2025-06-30", "acv": 246690, "currency": "USD", "agents": 720, "region": "Americas", "owner": "Amy Wiesenmayer", "ctype": "Addendum", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000hp5eQIAQ", "name": "Ageas UK | SVL | Multi ACD & QM | 2400 / 100", "account": "AGEAS UK - UK - ENTERPRISE", "top_parent": "AGEAS INSURANCE INTERNATIONAL", "close": "2025-06-30", "acv": 124975.28, "currency": "GBP", "agents": 2400, "region": "International", "owner": "Steven Lee", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-09-04"}, {"id": "006Ui00001Iy7JtIAJ", "name": "LOWE'S COMPANIES, INC. |  Amendment  | Conversion from Engage to Multi ACD", "account": "LOWE'S COMPANIES, INC.", "top_parent": "LOWE'S COMPANIES, INC.", "close": "2025-06-18", "acv": 680352.48, "currency": "USD", "agents": 1730, "region": "Americas", "owner": "Tony Hawkins", "ctype": "Addendum", "hub": "Real-Time", "integrations": [], "golive_status": "Delayed", "golive_date": "2026-10-05"}, {"id": "006Ui00001IeBmfIAF", "name": "ANZ NCCR Dev | ANZ", "account": "ANZ NCCR DEV", "top_parent": "AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED", "close": "2025-05-27", "acv": 0, "currency": "AUD", "agents": null, "region": "International", "owner": "Andrew Austin", "ctype": "Exst. Customer / New BU", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000Ro4QfIAJ", "name": "MetLife JPN | CXone Prod BU | Amendment | CXone Multi ACD Recording 600", "account": "METLIFE INSURANCE K.K.", "top_parent": "METLIFE, INC.", "close": "2025-05-16", "acv": 151233.96, "currency": "USD", "agents": null, "region": "International", "owner": "Tadamichi Yanagisawa", "ctype": "Addendum", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00001AmVpfIAF", "name": "Nutrien US LLC | Amendment | Uptivity Displacement", "account": "NUTRIEN US LLC", "top_parent": "Nutrien Ltd.", "close": "2025-05-16", "acv": 0, "currency": "USD", "agents": 100, "region": null, "owner": "Julie Henderson", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "0063n000010m4BwAAI", "name": "DWP - UK - Enterprise - CCaaS", "account": "DEPARTMENT FOR WORK AND PENSIONS", "top_parent": "DEPARTMENT FOR WORK AND PENSIONS - UK", "close": "2025-05-14", "acv": 10283533.27, "currency": "GBP", "agents": 40000, "region": "International", "owner": "Martin Joice", "ctype": "New Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui000012MCldIAG", "name": "Phelps County Regional Medical Center | Amendment | Uptivity Conversion", "account": "PHELPS MEDICAL CENTER", "top_parent": "Phelps County Regional Medical Center", "close": "2025-05-12", "acv": 806.4, "currency": "USD", "agents": 13, "region": null, "owner": "Julie Henderson", "ctype": "New OCR Logo", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-08-31"}, {"id": "006Ui00000uEyNRIA0", "name": "Bank of the Sierra | 2024 Uptivity Campaign | 30", "account": "BANK OF THE SIERRA", "top_parent": "Sierra Bancorp", "close": "2025-04-25", "acv": 0, "currency": "USD", "agents": 30, "region": null, "owner": "Kalie Phillipy", "ctype": "Exst. Customer / Cloud conversion", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-08-10"}, {"id": "006Ui00000RDFZZIA5", "name": "Continental Tire | 2024 Uptivity Campaign| 150", "account": "CONTINENTAL TIRE", "top_parent": "CONTINENTAL AG", "close": "2025-04-22", "acv": 7896, "currency": "USD", "agents": null, "region": "Americas", "owner": "Connor Rose", "ctype": "Exst. Customer / New BU", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000ZrcvpIAB", "name": "Regions  Financial Corporation | Call Recording | 2,150 | Multi-ACD", "account": "REGIONS FINANCIAL CORPORATION", "top_parent": "REGIONS FINANCIAL CORPORATION", "close": "2025-03-31", "acv": 409955.83, "currency": "USD", "agents": 1150, "region": "Americas", "owner": "Ed Lewczyk", "ctype": "New OCR Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000rIseYIAS", "name": "American National | Multi ACD | New BU", "account": "AMERICAN NATIONAL INSURANCE COMPANY INC", "top_parent": "AMERICAN NATIONAL INSURANCE COMPANY", "close": "2025-02-27", "acv": 270307.2, "currency": "USD", "agents": null, "region": "Americas", "owner": "Cassie Schroeder", "ctype": "Exst. Customer / New BU", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000aTVuwIAG", "name": "TFS Pilot - LiveVox for outbound and collections - LVOX", "account": "TOYOTA MOTOR CREDIT CORPORATION", "top_parent": "TOYOTA", "close": "2024-12-30", "acv": 0, "currency": "USD", "agents": 125, "region": "Americas", "owner": "Alex Scharwath", "ctype": "Exst. Customer / Expansions", "hub": "Offline", "integrations": ["SmartReach"], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000jHgc1IAC", "name": "MetLife JPN | CXone Dev BU | Amendment | CXone Multi ACD Recording 5", "account": "METLIFE INSURANCE K.K. DEV", "top_parent": "METLIFE, INC.", "close": "2024-12-25", "acv": 1293.96, "currency": "USD", "agents": null, "region": "International", "owner": "Tadamichi Yanagisawa", "ctype": "Addendum", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000fy5V3IAI", "name": "Lifeline Systems Canada, Inc. - 2024 Uptivity Campaign", "account": "LIFELINE OF CANADA HOLDINGS", "top_parent": "Lifeline of Canada Holdings Ltd", "close": "2024-12-17", "acv": 122472, "currency": "CAD", "agents": 130, "region": "Americas", "owner": "Curtis Hawkins", "ctype": "New Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000sVL5tIAG", "name": "NATIONAL GRID Multi ACD | QA | IA  | New Service LOB 300 Agent Add $224K", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "top_parent": "NATIONAL GRID", "close": "2024-12-09", "acv": 224100, "currency": "USD", "agents": 300, "region": "Americas", "owner": "Dave Smith", "ctype": "Addendum", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000OPWQHIA5", "name": "St Luke's | ICS | CXone | Multi ACD | 1000", "account": "ST. LUKE'S HEALTH SYSTEM", "top_parent": "St. Luke's Health System, Ltd.", "close": "2024-12-04", "acv": 248556, "currency": "USD", "agents": 70, "region": "Americas", "owner": "Ryan Black", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "ETA", "golive_date": "2026-09-14"}, {"id": "006Hu00001V4dsSIAR", "name": "IC24 - CCaaS", "account": "INTEGRATED CARE 24", "top_parent": "INTEGRATED CARE 24 LIMITED", "close": "2024-11-21", "acv": 441766.68, "currency": "GBP", "agents": 600, "region": "EMEA", "owner": "Adam Massingberd-Mundy", "ctype": "New OCR Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000Ql3rVIAR", "name": "ANZ Bank | Australia | Cloud Recording Multi ACD", "account": "ANZ", "top_parent": "AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED", "close": "2024-10-10", "acv": 1544373.6, "currency": "AUD", "agents": 4320, "region": "International", "owner": "Andrew Austin", "ctype": "Exst. Customer / Cloud conversion", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "006Ui00000Lg0abIAB", "name": "Healthcare Partners | Intelisys | CASS | Multi-ACD | 130", "account": "HEALTHCARE PARTNERS", "top_parent": "Healthcare Partners", "close": "2024-09-27", "acv": 104808.2, "currency": "USD", "agents": 130, "region": "Americas", "owner": "Tyler Walker", "ctype": "Exst. Customer / New LOB", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "0063n000010Dx2BAAS", "name": "El Paso Water Utilities- Multi-ACD", "account": "EL PASO WATER UTILITIES", "top_parent": "EL PASO WATER UTILITIES", "close": "2024-06-27", "acv": 31922.4, "currency": "USD", "agents": 50, "region": "Americas", "owner": "Lance Johnson", "ctype": "New OCR Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}, {"id": "0063n0000120KE3AAM", "name": "National Grid Attached CXone OPEN CISCO Analytics Quality  2000  Agents Attached Oppty 3 of 3", "account": "NATIONAL GRID USA SERVICE COMPANY INC", "top_parent": "NATIONAL GRID", "close": "2023-12-29", "acv": 1566267.48, "currency": "USD", "agents": 2000, "region": "Americas", "owner": "Dave Smith", "ctype": "New Logo", "hub": "Real-Time", "integrations": [], "golive_status": "Live", "golive_date": null}];
-const SF_BASE = "https://niceincontact.lightning.force.com/lightning/r/Opportunity/";
-
-async function checkPw() {
-  const val = document.getElementById('pwInput').value;
-  const enc = new TextEncoder().encode(val);
-  const digest = await crypto.subtle.digest('SHA-256', enc);
-  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('');
-  if (hex === "fa34e5bac87849343e48ccec9965e86629502a7f0c7c9f1e18abaa8a2240e673") {
-    sessionStorage.setItem('ehub_ok', '1');
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    init();
-  } else {
-    document.getElementById('pwErr').textContent = 'Incorrect password.';
-  }
+const PW_HASH="fa34e5bac87849343e48ccec9965e86629502a7f0c7c9f1e18abaa8a2240e673";
+const DATA={"rows":[{"id":"0063n000010laAfAAI","acct":"FORD MOTOR COMPANY - ENTERPRISE","name":"Ford Motor -RFP | CXone Suite + Digital -- (Cisco UCCE Displacement) -Skyward","type":"New OCR Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2025-07-30","acv":9986750.69,"cur":"USD","agents":5000,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Ben Tootle","group":"FORD MOTOR COMPANY"},{"id":"006Hu00001XhMB1IAN","acct":"OPTUMRX","name":"UHG - Optum RX Uptivity Migration to CXone MultiACD & QM 450","type":"Addendum","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-06-30","acv":246690.0,"cur":"USD","agents":720,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Amy Wiesenmayer","group":"UNITEDHEALTH GROUP INCORPORATED"},{"id":"006Ui00000GdYi9IAF","acct":"TD BANK","name":"TD Bank Financial Group - Pre prod environment (Cap 50 users)","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-10-31","acv":0.0,"cur":"CAD","agents":null,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Neil Balthazaar","group":"THE TORONTO-DOMINION BANK"},{"id":"006Ui00000aTVuwIAG","acct":"TOYOTA MOTOR CREDIT CORPORATION","name":"TFS Pilot - LiveVox for outbound and collections - LVOX","type":"Exst. Customer / Expansions","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2024-12-30","acv":0.0,"cur":"USD","agents":125,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Alex Scharwath","group":"TOYOTA"},{"id":"006Ui00000rHB6zIAG","acct":"THE TORONTO-DOMINION BANK US WEST","name":"TD Bank Financial Group | CXone Multi ACD | 450 Pilot","type":"Exst. Customer / Expansions","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-10-31","acv":0.0,"cur":"CAD","agents":1000,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Neil Balthazaar","group":"THE TORONTO-DOMINION BANK"},{"id":"006Ui00000uEyNRIA0","acct":"BANK OF THE SIERRA","name":"Bank of the Sierra | 2024 Uptivity Campaign | 30","type":"Exst. Customer / Cloud conversion","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-04-25","acv":0.0,"cur":"USD","agents":30,"region":"","gl":"ETA \u2192 2026-08-10","glcls":"gl-eta","glsort":"2026-08-10","owner":"Kalie Phillipy","group":"Sierra Bancorp"},{"id":"006Ui00001AmVpfIAF","acct":"NUTRIEN US LLC","name":"Nutrien US LLC | Amendment | Uptivity Displacement","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-05-16","acv":0.0,"cur":"USD","agents":100,"region":"","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Julie Henderson","group":"Nutrien Ltd."},{"id":"006Ui00001FlFCAIA3","acct":"ACCURATE BACKGROUND","name":"Accurate Background | CXone QMA","type":"Exst. Customer / New LOB","integ":[["Ticketing","#6100FF"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2025-08-15","acv":0.0,"cur":"USD","agents":200,"region":"","gl":"Delayed \u2192 2026-12-31","glcls":"gl-delayed","glsort":"2026-12-31","owner":"Emily Gray","group":"Accurate Background, LLC"},{"id":"006Ui00001IeBmfIAF","acct":"ANZ NCCR DEV","name":"ANZ NCCR Dev | ANZ","type":"Exst. Customer / New BU","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-05-27","acv":0.0,"cur":"AUD","agents":null,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Andrew Austin","group":"AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED"},{"id":"006Ui00001kd7Q1IAI","acct":"FRESENIUS PLANO TX","name":"FRESENIUS MEDICAL CARE | RCM | Direct Conversion | WFMA, QMA, IAA, AutoSummary, Actions, EvalSummary, SmartReach | #7/13","type":"Exst. Customer / New LOB","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2025-12-24","acv":186692.4,"cur":"USD","agents":120,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Charles Scheid","group":"Fresenius SE & Co. KGaA"},{"id":"006Ui00001waBEMIA2","acct":"WNS INDIA LTD- MULTI ACD LONDON BU","name":"WNS Multi ACD - Third BU London 1150 Licenses","type":"Exst. Customer / Cloud conversion","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-01-08","acv":0.0,"cur":"USD","agents":1150,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Mayur Jorapur","group":"WNS (HOLDINGS) LTD"},{"id":"006Ui000026cAebIAE","acct":"PT SOLUTIONS PHYSICAL THERAPY","name":"PT Solutions | Full Scope Quote | CP | Expert | AS | Skyward 2026","type":"Exst. Customer / New LOB","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-05-22","acv":371390.76,"cur":"USD","agents":120,"region":"Americas","gl":"ETA \u2192 2026-11-27","glcls":"gl-eta","glsort":"2026-11-27","owner":"Julie Chiles","group":"PT Solutions, LLC"},{"id":"006Ui00002Btqt5IAB","acct":"NELNET ENTERPRISE","name":"NELNET ENTERPRISE |  Amendment  | Smartreach recording","type":"Addendum","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-07-29","acv":1260.0,"cur":"USD","agents":null,"region":"Americas","gl":"ETA \u2192 2027-03-08","glcls":"gl-eta","glsort":"2027-03-08","owner":"Casey Jones","group":"NELNET, INC."},{"id":"006Ui00002JQIdFIAX","acct":"OneMain Financial","name":"OneMain Financial - Amendment 11 - Engagement Hub License Swap","type":"Addendum","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-05-20","acv":0.0,"cur":"USD","agents":null,"region":"Americas","gl":"ETA \u2192 2026-10-08","glcls":"gl-eta","glsort":"2026-10-08","owner":"Luke Johnson","group":"OneMain Financial"},{"id":"006Ui00002KscTaIAJ","acct":"METLIFE","name":"MetLife | CXone | Engagement Hub (CC, PbP attached) | 2,500","type":"Exst. Customer / New LOB","integ":[],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-07-31","acv":470761.56,"cur":"USD","agents":200,"region":"Americas","gl":"ETA \u2192 2027-07-23","glcls":"gl-eta","glsort":"2027-07-23","owner":"Brian Abele","group":"METLIFE, INC."},{"id":"006Ui00002Sw43hIAB","acct":"OPEN NETWORK EXCHANGE","name":"OPEN NETWORK EXCHANGE |  Amendment  | SmartReach CXone Recording","type":"Addendum","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-07-22","acv":0.0,"cur":"USD","agents":40,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Rick Tirado","group":"Open Network Exchange Inc"},{"id":"006Ui00002XexDUIAZ","acct":"NATIONAL GRID USA SERVICE COMPANY INC","name":"NATIONAL GRID | Tele Performance Competitive BPO Take out ~ Bring on 50 New Committed ACV Agents for Metering LOB","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-08-21","acv":37352.4,"cur":"USD","agents":50,"region":"Americas","gl":"TBD","glcls":"gl-tbd","glsort":null,"owner":"Dave Smith","group":"NATIONAL GRID"},{"id":"006Ui00002FBhfvIAD","acct":"ONESOURCE VIRTUAL INC","name":"ONESOURCE VIRTUAL INC |  Amendment  | WFM Prem + QMA Gen AI + IAA","type":"Exst. Customer / New LOB","integ":[["Ticketing","#6100FF"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-08-18","acv":185904.0,"cur":"USD","agents":null,"region":"Americas","gl":"TBD","glcls":"gl-tbd","glsort":null,"owner":"Tanner Plowman","group":"Onesource Virtual, Inc."},{"id":"006Ui00002bNnkrIAC","acct":"STANDARD INSURANCE COMPANY FEDRAMP","name":"STANDARD INSURANCE COMPANY FEDRAMP |  Amendment  | Engagement Hub","type":"Exst. Customer / Expansions","integ":[],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-08-14","acv":1008.0,"cur":"USD","agents":null,"region":"Americas","gl":"TBD","glcls":"gl-tbd","glsort":null,"owner":"David Young","group":"MEIJI YASUDA LIFE  INSURANCE COMPANY"},{"id":"006Ui00002CdM7BIAV","acct":"BRITISH TELECOMMUNICATIONS PLC - PM TEST INSTANCE","name":"BT - UK - Enterprise - CXone Engagement Hub - Multi-ACD - Test Platform","type":"Exst. Customer / Cloud conversion","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-08-07","acv":2305.39,"cur":"GBP","agents":18000,"region":"International","gl":"ETA \u2192 2026-09-01","glcls":"gl-eta","glsort":"2026-09-01","owner":"Richard Hawkes","group":"BT GROUP PLC ENTERPRISE"},{"id":"006Ui0000271A0KIAU","acct":"BRITISH TELECOMMUNICATIONS PLC - PM TEST INSTANCE","name":"BT - UK - Enterprise - CXone Engagement Hub - Multi-ACD - Production Platform - 18000","type":"Exst. Customer / Cloud conversion","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-08-07","acv":911979.02,"cur":"GBP","agents":18000,"region":"International","gl":"ETA \u2192 2026-09-01","glcls":"gl-eta","glsort":"2026-09-01","owner":"Richard Hawkes","group":"BT GROUP PLC ENTERPRISE"},{"id":"006Ui00002CdIJhIAN","acct":"BRITISH TELECOMMUNICATIONS PLC - PRE-PRODUCTION","name":"BT UK - Enterprise | CXone | Engagement Hub - Multi-ACD - Pre-Prod Platform","type":"New Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-08-07","acv":2305.39,"cur":"GBP","agents":18000,"region":"International","gl":"ETA \u2192 2026-09-01","glcls":"gl-eta","glsort":"2026-09-01","owner":"Richard Hawkes","group":"BT GROUP PLC ENTERPRISE"},{"id":"006Ui00002UmVX3IAN","acct":"SKIPTON BUILDING SOCIETY - UK","name":"SKIPTON BUILDING SOCIETY - UK |  Amendment  | 2026-06-10","type":"Addendum","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-08-06","acv":2880.0,"cur":"GBP","agents":560,"region":"International","gl":"Delayed \u2192 2026-08-06","glcls":"gl-delayed","glsort":"2026-08-06","owner":"Steven Lee","group":"SKIPTON BUILDING SOCIETY"},{"id":"006Ui00001tv9XqIAI","acct":"PUBLIC STORAGE OPERATING COMPANY","name":"PUBLIC STORAGE OPERATING COMPANY |  Amendment  | SmartReach","type":"Exst. Customer / New LOB","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-06-19","acv":96595.83,"cur":"USD","agents":null,"region":"Americas","gl":"ETA \u2192 2026-12-30","glcls":"gl-eta","glsort":"2026-12-30","owner":"Vanessa Crook","group":"PUBLIC STORAGE"},{"id":"006Ui0000226yLtIAI","acct":"INTUIT INC","name":"Intuit | CXone | SmartReach | 125","type":"New OCR Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-05-27","acv":103598.64,"cur":"USD","agents":125,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Wendy Ball","group":"INTUIT INC"},{"id":"006Ui00002Lscb7IAB","acct":"NATIONAL GRID USA SERVICE COMPANY INC","name":"NATIONAL GRID CXOne Recording/QM/Analytics New LOB ICOR Outsource Takeout 100 Agent $74,700 ACV","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-05-05","acv":74704.8,"cur":"USD","agents":100,"region":"Americas","gl":"TBD","glcls":"gl-tbd","glsort":null,"owner":"Dave Smith","group":"NATIONAL GRID"},{"id":"006Ui000029nDfRIAU","acct":"SHARP HEALTHCARE","name":"Sharp | Interaction Hub Migrated Calls","type":"New OCR Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-04-30","acv":264720.0,"cur":"USD","agents":500,"region":"Americas","gl":"ETA \u2192 2026-09-14","glcls":"gl-eta","glsort":"2026-09-14","owner":"Noa Nightingale","group":"SHARP HEALTHCARE"},{"id":"006Ui00002H5zzQIAR","acct":"MAKES CENTS INC.","name":"Makes Cents | NiCE CXone SmartReach 35","type":"New Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-04-23","acv":210828.48,"cur":"USD","agents":35,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"TeeJay Johnson","group":"Makes Cents Inc."},{"id":"006Ui00001iMFxqIAG","acct":"THE AA","name":"the AA/ Natilik/ Engagement hub with Co-Pilot and Cognigy/ 1650 config","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-03-31","acv":2166666.72,"cur":"GBP","agents":2345,"region":"International","gl":"Delayed \u2192 2027-02-26","glcls":"gl-delayed","glsort":"2027-02-26","owner":"Ian O'Farrell","group":"THE AUTOMOBILE ASSOCIATION LIMITED"},{"id":"006Ui00001oDCinIAG","acct":"NORTHWESTERN MEMORIAL HEALTHCARE","name":"NORTHWESTERN MEMORIAL HEALTHCARE |  Amendment  | Engagement Hub and Screen Recording Advanced","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2026-03-24","acv":58417.2,"cur":"USD","agents":null,"region":"Americas","gl":"Delayed \u2192 2026-07-31","glcls":"gl-delayed","glsort":"2026-07-31","owner":"Kyler Wilson","group":"Northwestern Memorial Healthcare"},{"id":"006Ui00001wt5upIAA","acct":"KRYTERION","name":"Kryterion | Multi-ACD | QMA | WFM | 210","type":"New Logo","integ":[["SmartReach","#FF8A00"],["Ticketing","#6100FF"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-03-20","acv":65724.02,"cur":"USD","agents":200,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Scott Steinert","group":"Kryterion"},{"id":"006Ui00001BopzlIAB","acct":"SPIRE","name":"Spire Energy | Accenture | CXone | 500","type":"New Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2026-01-20","acv":1432109.47,"cur":"USD","agents":500,"region":"Americas","gl":"Delayed \u2192 2026-10-15","glcls":"gl-delayed","glsort":"2026-10-15","owner":"Jason Cates","group":"Spire Inc."},{"id":"006Ui00001DqtztIAB","acct":"MERCY HEALTH","name":"Mercy | Recording Upgrade | Multi-ACD | 1025","type":"Exst. Customer / Cloud conversion","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-12-31","acv":537757.5,"cur":"USD","agents":2300,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"AJ Fasano","group":"MERCY HEALTH"},{"id":"006Ui00001cVjNRIA0","acct":"ACCA","name":"ACCA | SVL | CXone | Hub | 150","type":"Exst. Customer / New BU","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-12-24","acv":44730.0,"cur":"GBP","agents":150,"region":"International","gl":"Delayed \u2192 2026-10-08","glcls":"gl-delayed","glsort":"2026-10-08","owner":"Joshua Hendon","group":"ASSOCIATION OF CHARTERED ACCOUNTANTS"},{"id":"006Hu00001V4FujIAF","acct":"MINISTERE DU REVENU DU QUEBEC","name":"Revenu Quebec - CXone Multi ACD for CMS with QM for 2000","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-12-23","acv":587691.91,"cur":"CAD","agents":1800,"region":"Americas","gl":"ETA \u2192 2026-09-14","glcls":"gl-eta","glsort":"2026-09-14","owner":"Ian Gillman","group":"GOUVERNEMENT DE LA PROVINCE DE QUEBEC"},{"id":"006Ui00001f4ZVJIA2","acct":"SKIPTON BUILDING SOCIETY - UK","name":"Teams recording solution","type":"New OCR Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-12-19","acv":34692.96,"cur":"GBP","agents":410,"region":"","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Steven Lee","group":"SKIPTON BUILDING SOCIETY"},{"id":"006Ui00001eiPHjIAM","acct":"UHSM","name":"UHSM | CXone | Suite | 130 Agents","type":"New Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2025-11-25","acv":390768.84,"cur":"USD","agents":145,"region":"","gl":"ETA \u2192 2026-08-28","glcls":"gl-eta","glsort":"2026-08-28","owner":"Jesse DiCocco","group":"United Faith Ministries, Inc."},{"id":"006Ui00000vVOQDIA4","acct":"TDS TELECOM","name":"TDS Telecom | CXone, Enlighten | 1100","type":"New Logo","integ":[["SmartReach","#FF8A00"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2025-11-17","acv":1415003.8,"cur":"USD","agents":1100,"region":"Americas","gl":"Delayed \u2192 2028-01-19","glcls":"gl-delayed","glsort":"2028-01-19","owner":"Todd Brown","group":"TELEPHONE AND DATA SYSTEMS, INC."},{"id":"006Ui00001K1hWjIAJ","acct":"PAYWARD, INC.","name":"Kraken - 2025 Playvox QM Campaign (Project Catalyst)","type":"Exst. Customer / New LOB","integ":[["Ticketing","#6100FF"]],"hub":"Offline","hubcolor":"#36EAD0","close":"2025-10-22","acv":11520.0,"cur":"USD","agents":60,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Ali Cazel","group":"Payward, Inc."},{"id":"0063n000011zsc1AAA","acct":"THE TORONTO-DOMINION BANK US WEST","name":"TD Bank Financial Group - CXone Multi ACD - Verint Takeout","type":"Addendum","integ":[],"hub":"RT + Offline","hubcolor":"#6100FF","close":"2025-09-26","acv":3718700.67,"cur":"CAD","agents":null,"region":"Americas","gl":"Delayed \u2192 2026-11-27","glcls":"gl-delayed","glsort":"2026-11-27","owner":"Neil Balthazaar","group":"THE TORONTO-DOMINION BANK"},{"id":"006Ui00001HUFljIAH","acct":"WNS GLOBAL SERVICES - TOKYO BU","name":"WNS On Prem to Cloud (Multi ACD) Tokyo BU","type":"Exst. Customer / New BU","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-09-26","acv":304352.28,"cur":"USD","agents":null,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Mayur Jorapur","group":"WNS (HOLDINGS) LTD"},{"id":"006Ui00001jQGbVIAW","acct":"WNS GLOBAL SERVICES - INDIA HQ","name":"WNS On Prem to Cloud (Multi ACD) US BU 200","type":"Exst. Customer / New BU","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-09-26","acv":28966.32,"cur":"USD","agents":200,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Mayur Jorapur","group":"WNS (HOLDINGS) LTD"},{"id":"006Ui00001hh2wXIAQ","acct":"NATIONAL GRID USA SERVICE COMPANY INC","name":"NATIONAL GRID USA SERVICE COMPANY INC New LOB  400 Agent Add","type":"Exst. Customer / Expansions","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-09-23","acv":298800.0,"cur":"USD","agents":400,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Dave Smith","group":"NATIONAL GRID"},{"id":"006Ui00000hp5eQIAQ","acct":"AGEAS UK - UK - ENTERPRISE","name":"Ageas UK | SVL | Multi ACD & QM | 2400 / 100","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-06-30","acv":124975.28,"cur":"GBP","agents":2400,"region":"International","gl":"ETA \u2192 2026-09-04","glcls":"gl-eta","glsort":"2026-09-04","owner":"Steven Lee","group":"AGEAS INSURANCE INTERNATIONAL"},{"id":"006Ui00001Iy7JtIAJ","acct":"LOWE'S COMPANIES, INC.","name":"LOWE\u2019S COMPANIES, INC. |  Amendment  | Conversion from Engage to Multi ACD","type":"Addendum","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-06-18","acv":680352.48,"cur":"USD","agents":1730,"region":"Americas","gl":"Delayed \u2192 2026-10-05","glcls":"gl-delayed","glsort":"2026-10-05","owner":"Tony Hawkins","group":"LOWE'S COMPANIES, INC."},{"id":"006Ui00000Ro4QfIAJ","acct":"METLIFE INSURANCE K.K.","name":"MetLife JPN | CXone Prod BU | Amendment | CXone Multi ACD Recording 600","type":"Addendum","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-05-16","acv":151233.96,"cur":"USD","agents":null,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Tadamichi Yanagisawa","group":"METLIFE, INC."},{"id":"006Ui000012MCldIAG","acct":"PHELPS MEDICAL CENTER","name":"Phelps County Regional Medical Center | Amendment | Uptivity Conversion","type":"New OCR Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-05-12","acv":806.4,"cur":"USD","agents":13,"region":"","gl":"ETA \u2192 2026-08-31","glcls":"gl-eta","glsort":"2026-08-31","owner":"Julie Henderson","group":"Phelps County Regional Medical Center"},{"id":"006Ui00000RDFZZIA5","acct":"CONTINENTAL TIRE","name":"Continental Tire | 2024 Uptivity Campaign| 150","type":"Exst. Customer / New BU","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-04-22","acv":7896.0,"cur":"USD","agents":null,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Connor Rose","group":"CONTINENTAL AG"},{"id":"006Ui00000ZrcvpIAB","acct":"REGIONS FINANCIAL CORPORATION","name":"Regions  Financial Corporation | Call Recording | 2,150 | Multi-ACD","type":"New OCR Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-03-31","acv":409955.83,"cur":"USD","agents":1150,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Ed Lewczyk","group":"REGIONS FINANCIAL CORPORATION"},{"id":"006Ui00000rIseYIAS","acct":"AMERICAN NATIONAL INSURANCE COMPANY INC","name":"American National | Multi ACD | New BU","type":"Exst. Customer / New BU","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2025-02-27","acv":270307.2,"cur":"USD","agents":null,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Cassie Schroeder","group":"AMERICAN NATIONAL INSURANCE COMPANY"},{"id":"006Ui00000jHgc1IAC","acct":"METLIFE INSURANCE K.K. DEV","name":"MetLife JPN | CXone Dev BU | Amendment | CXone Multi ACD Recording 5","type":"Addendum","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-12-25","acv":1293.96,"cur":"USD","agents":null,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Tadamichi Yanagisawa","group":"METLIFE, INC."},{"id":"006Ui00000fy5V3IAI","acct":"LIFELINE OF CANADA HOLDINGS","name":"Lifeline Systems Canada, Inc. - 2024 Uptivity Campaign","type":"New Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-12-17","acv":122472.0,"cur":"CAD","agents":130,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Curtis Hawkins","group":"Lifeline of Canada Holdings Ltd"},{"id":"006Ui00000sVL5tIAG","acct":"NATIONAL GRID USA SERVICE COMPANY INC","name":"NATIONAL GRID Multi ACD | QA | IA  | New Service LOB 300 Agent Add $224K","type":"Addendum","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-12-09","acv":224100.0,"cur":"USD","agents":300,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Dave Smith","group":"NATIONAL GRID"},{"id":"006Ui00000OPWQHIA5","acct":"ST. LUKE'S HEALTH SYSTEM","name":"St Luke's | ICS | CXone | Multi ACD | 1000","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-12-04","acv":248556.0,"cur":"USD","agents":70,"region":"Americas","gl":"ETA \u2192 2026-09-14","glcls":"gl-eta","glsort":"2026-09-14","owner":"Ryan Black","group":"St. Luke's Health System, Ltd."},{"id":"006Hu00001V4dsSIAR","acct":"INTEGRATED CARE 24","name":"IC24 - CCaaS","type":"New OCR Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-11-21","acv":441766.68,"cur":"GBP","agents":600,"region":"EMEA","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Adam Massingberd-Mundy","group":"INTEGRATED CARE 24 LIMITED"},{"id":"006Ui00000Ql3rVIAR","acct":"ANZ","name":"ANZ Bank | Australia | Cloud Recording Multi ACD","type":"Exst. Customer / Cloud conversion","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-10-10","acv":1544373.6,"cur":"AUD","agents":4320,"region":"International","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Andrew Austin","group":"AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED"},{"id":"006Ui00000Lg0abIAB","acct":"HEALTHCARE PARTNERS","name":"Healthcare Partners | Intelisys | CASS | Multi-ACD | 130","type":"Exst. Customer / New LOB","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-09-27","acv":104808.2,"cur":"USD","agents":130,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Tyler Walker","group":"Healthcare Partners"},{"id":"0063n000010Dx2BAAS","acct":"EL PASO WATER UTILITIES","name":"El Paso Water Utilities- Multi-ACD","type":"New OCR Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2024-06-27","acv":31922.4,"cur":"USD","agents":50,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Lance Johnson","group":"EL PASO WATER UTILITIES"},{"id":"0063n0000120KE3AAM","acct":"NATIONAL GRID USA SERVICE COMPANY INC","name":"National Grid Attached CXone OPEN CISCO Analytics Quality  2000  Agents Attached Oppty 3 of 3","type":"New Logo","integ":[],"hub":"Real-Time","hubcolor":"#3694FC","close":"2023-12-29","acv":1566267.48,"cur":"USD","agents":2000,"region":"Americas","gl":"Live","glcls":"gl-live","glsort":null,"owner":"Dave Smith","group":"NATIONAL GRID"}],"grp_recent":{"FORD MOTOR COMPANY":"2025-07-30","UNITEDHEALTH GROUP INCORPORATED":"2025-06-30","THE TORONTO-DOMINION BANK":"2025-10-31","TOYOTA":"2024-12-30","Sierra Bancorp":"2025-04-25","Nutrien Ltd.":"2025-05-16","Accurate Background, LLC":"2025-08-15","AUSTRALIA AND NEW ZEALAND BANKING GROUP LIMITED":"2025-05-27","Fresenius SE & Co. KGaA":"2025-12-24","WNS (HOLDINGS) LTD":"2026-01-08","PT Solutions, LLC":"2026-05-22","NELNET, INC.":"2026-07-29","OneMain Financial":"2026-05-20","METLIFE, INC.":"2026-07-31","Open Network Exchange Inc":"2026-07-22","NATIONAL GRID":"2026-08-21","Onesource Virtual, Inc.":"2026-08-18","MEIJI YASUDA LIFE  INSURANCE COMPANY":"2026-08-14","BT GROUP PLC ENTERPRISE":"2026-08-07","SKIPTON BUILDING SOCIETY":"2026-08-06","PUBLIC STORAGE":"2026-06-19","INTUIT INC":"2026-05-27","SHARP HEALTHCARE":"2026-04-30","Makes Cents Inc.":"2026-04-23","THE AUTOMOBILE ASSOCIATION LIMITED":"2026-03-31","Northwestern Memorial Healthcare":"2026-03-24","Kryterion":"2026-03-20","Spire Inc.":"2026-01-20","MERCY HEALTH":"2025-12-31","ASSOCIATION OF CHARTERED ACCOUNTANTS":"2025-12-24","GOUVERNEMENT DE LA PROVINCE DE QUEBEC":"2025-12-23","United Faith Ministries, Inc.":"2025-11-25","TELEPHONE AND DATA SYSTEMS, INC.":"2025-11-17","Payward, Inc.":"2025-10-22","AGEAS INSURANCE INTERNATIONAL":"2025-06-30","LOWE'S COMPANIES, INC.":"2025-06-18","Phelps County Regional Medical Center":"2025-05-12","CONTINENTAL AG":"2025-04-22","REGIONS FINANCIAL CORPORATION":"2025-03-31","AMERICAN NATIONAL INSURANCE COMPANY":"2025-02-27","Lifeline of Canada Holdings Ltd":"2024-12-17","St. Luke's Health System, Ltd.":"2024-12-04","INTEGRATED CARE 24 LIMITED":"2024-11-21","Healthcare Partners":"2024-09-27","EL PASO WATER UTILITIES":"2024-06-27"}};
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function check(){const v=document.getElementById('pw').value;const h=await sha256(v);if(h===PW_HASH){localStorage.setItem('ehub_ok','1');show();}else{document.getElementById('err').textContent='Incorrect password';}}
+function show(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';init();}
+if(localStorage.getItem('ehub_ok')==='1'){window.addEventListener('DOMContentLoaded',show);}
+let sortKey='glsort',sortDir=1;
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();}
+function init(){
+ const regs=[...new Set(DATA.rows.map(r=>r.region).filter(x=>x))].sort();
+ const rs=document.getElementById('region');regs.forEach(r=>{const o=document.createElement('option');o.textContent=r;rs.appendChild(o);});
+ const total=DATA.rows.length;
+ const live=DATA.rows.filter(r=>r.glcls==='gl-live').length;
+ const delayed=DATA.rows.filter(r=>r.glcls==='gl-delayed').length;
+ const eta=DATA.rows.filter(r=>r.glcls==='gl-eta').length;
+ const tbd=DATA.rows.filter(r=>r.glcls==='gl-tbd').length;
+ const usdAcv=DATA.rows.filter(r=>r.cur==='USD').reduce((s,r)=>s+(r.acv||0),0);
+ const kpis=document.getElementById('kpis');
+ kpis.innerHTML=
+  '<div class="kpi"><div class="v">'+total+'</div><div class="l">Total Deals</div></div>'+
+  '<div class="kpi"><div class="v">$'+Math.round(usdAcv).toLocaleString()+'</div><div class="l">USD ACV</div></div>'+
+  '<div class="kpi"><div class="v">'+live+'</div><div class="l">Live</div></div>'+
+  '<div class="kpi"><div class="v">'+delayed+'</div><div class="l">Delayed</div></div>'+
+  '<div class="kpi"><div class="v">'+eta+'</div><div class="l">ETA</div></div>'+
+  '<div class="kpi"><div class="v">'+tbd+'</div><div class="l">TBD</div></div>';
+ render();
 }
-document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
-
-if (sessionStorage.getItem('ehub_ok') === '1') {
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  window.addEventListener('DOMContentLoaded', init);
+function fmtACV(r){return r.cur+' '+(r.acv?r.acv.toLocaleString(undefined,{maximumFractionDigits:0}):'0');}
+function glCategory(r){if(r.glcls==='gl-live')return 'Live';if(r.glcls==='gl-delayed')return 'Delayed';if(r.glcls==='gl-eta')return 'ETA';return 'TBD';}
+function render(){
+ const q=document.getElementById('search').value.toLowerCase();
+ const fr=document.getElementById('region').value,fh=document.getElementById('hub').value,fs=document.getElementById('status').value;
+ let rows=DATA.rows.filter(r=>{
+   if(q&&!(r.acct.toLowerCase().includes(q)||r.name.toLowerCase().includes(q)))return false;
+   if(fr&&r.region!==fr)return false;
+   if(fh&&r.hub!==fh)return false;
+   if(fs&&glCategory(r)!==fs)return false;
+   return true;
+ });
+ rows.sort((a,b)=>{
+   let x,y;
+   if(sortKey==='glsort'){
+     const rank=r=>r.glcls==='gl-live'?0:(r.glcls==='gl-tbd'?2:1);
+     const ra=rank(a),rb=rank(b);
+     if(ra!==rb)return ra-rb;
+     if(ra===1){x=a.glsort||'9999';y=b.glsort||'9999';return x<y?-1:x>y?1:0;}
+     return 0;
+   }
+   x=a[sortKey];y=b[sortKey];
+   if(sortKey==='acv'||sortKey==='agents'){x=x||0;y=y||0;return (x-y)*sortDir;}
+   x=(x||'').toString().toLowerCase();y=(y||'').toString().toLowerCase();
+   return (x<y?-1:x>y?1:0)*sortDir;
+ });
+ const groups={};rows.forEach(r=>{(groups[r.group]=groups[r.group]||[]).push(r);});
+ const gorder=Object.keys(groups).sort((a,b)=>DATA.grp_recent[b].localeCompare(DATA.grp_recent[a]));
+ const tb=document.getElementById('tb');tb.innerHTML='';
+ if(rows.length===0){tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:30px;color:#999;">No deals match filters</td></tr>';return;}
+ gorder.forEach(g=>{
+   const tr=document.createElement('tr');tr.className='grp';
+   tr.innerHTML='<td colspan="11">'+esc(g)+' \u00b7 '+groups[g].length+' deal(s)</td>';tb.appendChild(tr);
+   groups[g].forEach(r=>{
+     const integ=r.integ.map(i=>'<span class="badge" style="background:'+i[1]+'">'+i[0]+'</span>').join('');
+     const tr2=document.createElement('tr');
+     tr2.innerHTML='<td>'+esc(r.acct)+'</td>'+
+      '<td><a href="https://niceincontact.lightning.force.com/lightning/r/Opportunity/'+r.id+'/view" target="_blank">'+esc(r.name)+'</a></td>'+
+      '<td>'+esc(r.type)+'</td><td>'+integ+'</td>'+
+      '<td><span class="hub" style="background:'+r.hubcolor+'">'+r.hub+'</span></td>'+
+      '<td>'+r.close+'</td><td>'+fmtACV(r)+'</td>'+
+      '<td>'+(r.agents!=null?r.agents:'')+'</td><td>'+esc(r.region)+'</td>'+
+      '<td class="'+r.glcls+'">'+esc(r.gl)+'</td><td>'+esc(r.owner)+'</td>';
+     tb.appendChild(tr2);
+   });
+ });
 }
-
-let sortCol = null, sortDir = 1; // 1 asc, -1 desc, then reset to grouped
-
-function fmtMoney(acv, cur) {
-  const sign = cur === 'USD' ? '$' : (cur + ' ');
-  return sign + Number(acv).toLocaleString(undefined, {maximumFractionDigits:0});
-}
-
-function hubClass(hub) {
-  if (hub === 'RT + Offline') return 'hub-both';
-  if (hub === 'Offline') return 'hub-offline';
-  return 'hub-rt';
-}
-
-function integBadges(list) {
-  const map = {SmartReach:'badge-sr', Ticketing:'badge-tk', AMC:'badge-amc'};
-  return list.map(i => `<span class="pill ${map[i]||''}">${i}</span>`).join('');
-}
-
-function statusClass(s) {
-  if (s === 'Live') return 'status-live';
-  if (s === 'Delayed') return 'status-delayed';
-  if (s === 'ETA') return 'status-eta';
-  return 'status-tbd';
-}
-
-function statusLabel(r) {
-  if (r.golive_status === 'Live') return 'Live';
-  if (r.golive_status === 'TBD') return 'TBD';
-  return `${r.golive_status} ${r.golive_date}`;
-}
-
-// sort key for Go-Live column: Live first (rank0), Delayed/ETA merged by date (rank1), TBD last (rank2)
-function goliveSortKey(r) {
-  if (r.golive_status === 'Live') return [0, ''];
-  if (r.golive_status === 'TBD') return [2, ''];
-  return [1, r.golive_date || ''];
-}
-
-function populateFilters() {
-  const regions = [...new Set(DATA.map(r => r.region).filter(Boolean))].sort();
-  const hubs = [...new Set(DATA.map(r => r.hub))].sort();
-  const statuses = ['Live','Delayed','ETA','TBD'];
-  const regionSel = document.getElementById('regionFilter');
-  const hubSel = document.getElementById('hubFilter');
-  const statusSel = document.getElementById('statusFilter');
-  regions.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; regionSel.appendChild(o); });
-  hubs.forEach(h => { const o = document.createElement('option'); o.value = h; o.textContent = h; hubSel.appendChild(o); });
-  statuses.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; statusSel.appendChild(o); });
-}
-
-function getFiltered() {
-  const q = document.getElementById('searchBox').value.trim().toLowerCase();
-  const region = document.getElementById('regionFilter').value;
-  const hub = document.getElementById('hubFilter').value;
-  const status = document.getElementById('statusFilter').value;
-  return DATA.filter(r => {
-    if (q && !(r.account.toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || r.top_parent.toLowerCase().includes(q))) return false;
-    if (region && r.region !== region) return false;
-    if (hub && r.hub !== hub) return false;
-    if (status && r.golive_status !== status) return false;
-    return true;
-  });
-}
-
-function dealRowHtml(r, showAccount) {
-  const acctCell = showAccount
-    ? (r.account !== r.top_parent ? `<td class="acct-muted">${r.account}</td>` : `<td>${r.account}</td>`)
-    : `<td></td>`;
-  return `<tr class="deal-row">
-    ${acctCell}
-    <td><a class="dealname" target="_blank" href="${SF_BASE}${r.id}/view">${r.name}</a></td>
-    <td>${r.ctype||''}</td>
-    <td>${integBadges(r.integrations)}</td>
-    <td><span class="pill ${hubClass(r.hub)}">${r.hub}</span></td>
-    <td>${r.close}</td>
-    <td>${fmtMoney(r.acv, r.currency)}</td>
-    <td>${r.agents ?? ''}</td>
-    <td>${r.region||''}</td>
-    <td class="${statusClass(r.golive_status)}">${statusLabel(r)}</td>
-    <td>${r.owner||''}</td>
-  </tr>`;
-}
-
-function render() {
-  const filtered = getFiltered();
-  const tbody = document.getElementById('tbody');
-  const countLine = document.getElementById('countLine');
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="noresults">No deals match the current filters.</td></tr>`;
-    countLine.textContent = '0 deals · 0 accounts';
-    return;
-  }
-
-  if (sortCol) {
-    const withKey = filtered.map(r => {
-      let key;
-      if (sortCol === 'golive') key = goliveSortKey(r);
-      else if (sortCol === 'acv') key = [0, r.acv];
-      else if (sortCol === 'close') key = [0, r.close];
-      else if (sortCol === 'agents') key = [0, r.agents ?? -1];
-      else if (sortCol === 'integrations') key = [0, (r.integrations||[]).join(',')];
-      else key = [0, (r[sortCol] ?? '').toString().toLowerCase()];
-      return {r, key};
-    });
-    withKey.sort((a,b) => {
-      if (a.key[0] !== b.key[0]) return a.key[0] - b.key[0];
-      if (a.key[1] < b.key[1]) return -1 * sortDir;
-      if (a.key[1] > b.key[1]) return 1 * sortDir;
-      return 0;
-    });
-    tbody.innerHTML = withKey.map(x => dealRowHtml(x.r, true)).join('');
-    const accts = new Set(filtered.map(r => r.top_parent));
-    countLine.textContent = `${filtered.length} deals · ${accts.size} accounts`;
-    return;
-  }
-
-  // grouped view
-  const groups = {};
-  filtered.forEach(r => {
-    const key = r.top_parent || r.account;
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(r);
-  });
-  const groupList = Object.entries(groups).map(([name, deals]) => {
-    deals.sort((a,b) => a.close < b.close ? -1 : (a.close > b.close ? 1 : 0));
-    const maxClose = deals.reduce((m,d) => d.close > m ? d.close : m, deals[0].close);
-    const totalAcv = deals.reduce((s,d) => s + (d.currency === 'USD' ? d.acv : 0), 0);
-    const hubs = [...new Set(deals.map(d => d.hub))];
-    return {name, deals, maxClose, totalAcv, hubs};
-  });
-  groupList.sort((a,b) => a.maxClose < b.maxClose ? 1 : (a.maxClose > b.maxClose ? -1 : 0));
-
-  let html = '';
-  groupList.forEach(g => {
-    html += `<tr class="group-row"><td colspan="11">${g.name} — ${g.deals.length} deal${g.deals.length>1?'s':''} · ${g.hubs.map(h=>`<span class="pill ${hubClass(h)}">${h}</span>`).join('')} · Total ACV (USD): $${g.totalAcv.toLocaleString(undefined,{maximumFractionDigits:0})}</td></tr>`;
-    g.deals.forEach(d => { html += dealRowHtml(d, false); });
-  });
-  tbody.innerHTML = html;
-  const accts = new Set(filtered.map(r => r.top_parent));
-  countLine.textContent = `${filtered.length} deals · ${accts.size} accounts`;
-}
-
-function updateSortArrows() {
-  document.querySelectorAll('th[data-col]').forEach(th => {
-    th.querySelectorAll('.sort-arrow').forEach(s => s.remove());
-    if (th.dataset.col === sortCol) {
-      const span = document.createElement('span');
-      span.className = 'sort-arrow';
-      span.textContent = sortDir === 1 ? '▲' : '▼';
-      th.appendChild(span);
-    }
-  });
-}
-
-function attachSort() {
-  document.querySelectorAll('th[data-col]').forEach(th => {
-    th.addEventListener('click', () => {
-      const col = th.dataset.col;
-      if (sortCol !== col) {
-        sortCol = col; sortDir = 1;
-      } else if (sortDir === 1) {
-        sortDir = -1;
-      } else {
-        sortCol = null; sortDir = 1;
-      }
-      updateSortArrows();
-      render();
-    });
-  });
-}
-
-function init() {
-  populateFilters();
-  attachSort();
-  ['searchBox','regionFilter','hubFilter','statusFilter'].forEach(id => {
-    document.getElementById(id).addEventListener('input', render);
-    document.getElementById(id).addEventListener('change', render);
-  });
-  render();
-}
-</script>
-</body>
-</html>
+function esc(s){return (s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+</script></body></html>
