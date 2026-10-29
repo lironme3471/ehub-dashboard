@@ -101,7 +101,8 @@ GL_OVERRIDE = {
     '006Ui00001iMFxqIAG': ('ETA', '2026-12-14'), '006Ui00000vVOQDIA4': ('ETA', '2026-11-16'),
     '006Ui00001kd7Q1IAI': ('TBD', None),         '006Ui00001kS33BIAS': ('ETA', '2026-10-13'),
     '006Ui00002BWqsCIAT': ('ETA', '2026-11-19'),
-    '006Ui000012MCldIAG': ('TBD', None)}  # Phelps — TBD per Liron 2026-10-29
+    '006Ui000012MCldIAG': ('TBD', None),
+    '006Ui00002XqV3lIAF': ('ETA', '2027-01-26')}  # Lenovo — ETA 26/1/2027 per Liron 2026-10-29  # Phelps — TBD per Liron 2026-10-29
 
 DATA_FILES = ['q1a', 'q1b', 'q1c', 'q1force', 'q2', 'q3', 'q4', 'q5', 'q6', 'qN']
 OPTIONAL_FILES = ['q1carry']
