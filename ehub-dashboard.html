@@ -15,6 +15,18 @@ main{padding:16px 24px 40px}
 .kpi .v{font-size:22px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
 .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
 .filters input,.filters select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--char)}
+.ms{position:relative}
+.ms-btn{font:inherit;padding:7px 30px 7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--char);cursor:pointer;min-width:180px;text-align:left;position:relative;white-space:nowrap}
+.ms-btn:after{content:'\25BE';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.ms-btn.active{border-color:#3694FC;background:#EEF5FF;color:#1E5FB8;font-weight:600}
+.ms-panel{display:none;position:absolute;z-index:20;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px;min-width:210px}
+.ms.open .ms-panel{display:block}
+.ms-panel label{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.ms-panel label:hover{background:#F3F6FC}
+.filters .ms-panel input{min-width:0;max-width:none;flex:0 0 auto;width:auto;margin:0;padding:0;accent-color:#3694FC}
+.ms-panel label{justify-content:flex-start}
+.ms-actions{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:4px;padding:6px 6px 2px}
+.ms-actions a{color:#3694FC;cursor:pointer;font-size:12px;font-weight:600}
 .filters input{min-width:240px;flex:1 1 240px;max-width:380px}
 .btn{font:inherit;font-weight:600;background:#3694FC;color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer}.btn:hover{filter:brightness(.95)}
 .count{color:var(--muted);margin-left:auto}
@@ -55,9 +67,9 @@ a.deal{color:var(--blue);text-decoration:none}a.deal:hover{text-decoration:under
 </div>
 <div class="filters">
 <input id="f-q" type="search" placeholder="Search account or deal name" oninput="render()">
-<select id="f-region" onchange="render()"><option value="">All regions</option></select>
-<select id="f-hub" onchange="render()"><option value="">All hub types</option><option>Real-Time</option><option>Offline</option><option>RT + Offline</option></select>
-<select id="f-gl" onchange="render()"><option value="">All go-live statuses</option><option>Live</option><option>Delayed</option><option>ETA</option><option>TBD</option></select>
+<div class="ms" id="f-region" data-all="All regions" data-unit="regions"></div>
+<div class="ms" id="f-hub" data-all="All hub types" data-unit="hub types"></div>
+<div class="ms" id="f-gl" data-all="All go-live statuses" data-unit="statuses"></div>
 <button class="btn" id="export-btn" onclick="exportExcel()">Export to Excel</button>
 <span class="count" id="count"></span>
 </div>
@@ -96,8 +108,24 @@ function hubCls(h){return h==='Real-Time'?'hub-rt':h==='Offline'?'hub-off':'hub-
 function badgeHtml(b){var c=BADGE_COLORS[b]||'#6B7280';var dark=(b==='AutoSummary'||b==='Copilot'||b==='SmartReach');return '<span class="b" style="background:'+c+(dark?';color:#21212B':'')+'">'+esc(b)+'</span>';}
 
 let filtersReady=false;
-function initFilters(){if(filtersReady)return;filtersReady=true;var regs=Array.from(new Set(DATA.map(function(r){return r.region||'';}))).sort();var sel=document.getElementById('f-region');
-regs.forEach(function(g){var o=document.createElement('option');o.value=g||'__blank__';o.textContent=g||'(blank)';sel.appendChild(o);});}
+function initFilters(){if(filtersReady)return;filtersReady=true;
+ var regs=Array.from(new Set(DATA.map(function(r){return r.region||'';}))).sort();
+ buildMS('f-region',regs.map(function(g){return{v:g||'__blank__',l:g||'(blank)'};}));
+ buildMS('f-hub',['Real-Time','Offline','RT + Offline'].map(function(v){return{v:v,l:v};}));
+ buildMS('f-gl',['Live','Delayed','ETA','TBD'].map(function(v){return{v:v,l:v};}));
+ document.addEventListener('click',function(e){document.querySelectorAll('.ms.open').forEach(function(m){if(!m.contains(e.target))m.classList.remove('open');});});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.ms.open').forEach(function(m){m.classList.remove('open');});});}
+function buildMS(id,opts){var el=document.getElementById(id);
+ el.innerHTML='<button type="button" class="ms-btn"></button><div class="ms-panel">'+opts.map(function(o){return '<label><input type="checkbox" value="'+esc(o.v)+'" data-l="'+esc(o.l)+'"> '+esc(o.l)+'</label>';}).join('')+'<div class="ms-actions"><a data-act="all">Select all</a><a data-act="none">Clear</a></div></div>';
+ el.querySelector('.ms-btn').onclick=function(){var open=!el.classList.contains('open');document.querySelectorAll('.ms.open').forEach(function(m){m.classList.remove('open');});if(open)el.classList.add('open');};
+ el.querySelectorAll('input').forEach(function(i){i.onchange=function(){msLabel(id);render();};});
+ el.querySelectorAll('.ms-actions a').forEach(function(a){a.onclick=function(){var on=a.getAttribute('data-act')==='all';el.querySelectorAll('input').forEach(function(i){i.checked=on;});msLabel(id);render();};});
+ msLabel(id);}
+function msVals(id){return Array.from(document.querySelectorAll('#'+id+' input:checked')).map(function(i){return i.value;});}
+function msLabel(id){var el=document.getElementById(id),all=el.querySelectorAll('input').length,ch=el.querySelectorAll('input:checked'),b=el.querySelector('.ms-btn');
+ var partial=ch.length>0&&ch.length<all;
+ b.textContent=!partial?el.getAttribute('data-all'):ch.length===1?ch[0].getAttribute('data-l'):ch.length+' '+el.getAttribute('data-unit');
+ b.classList.toggle('active',partial);}
 
 function sortKey(r,col){switch(col){
  case 'integration':return r.badges.join(', ').toLowerCase();
@@ -109,11 +137,11 @@ function cmp(a,b){return a<b?-1:a>b?1:0;}
 function setSort(c){if(sortCol===c){if(sortDir===1){sortDir=-1;}else{sortCol=null;sortDir=1;}}else{sortCol=c;sortDir=1;}render();}
 
 function render(){
- var q=document.getElementById('f-q').value.trim().toLowerCase(),reg=document.getElementById('f-region').value,hub=document.getElementById('f-hub').value,gl=document.getElementById('f-gl').value;
+ var q=document.getElementById('f-q').value.trim().toLowerCase(),reg=msVals('f-region'),hub=msVals('f-hub'),gl=msVals('f-gl');
  var rows=DATA.filter(function(r){
   if(q&&(r.account+' '+r.name+' '+r.group).toLowerCase().indexOf(q)<0)return false;
-  if(reg&&(reg==='__blank__'?(r.region||'')!=='':r.region!==reg))return false;
-  if(hub&&r.hub!==hub)return false; if(gl&&r.gl!==gl)return false; return true;});
+  if(reg.length&&reg.indexOf(r.region||'__blank__')<0)return false;
+  if(hub.length&&hub.indexOf(r.hub)<0)return false; if(gl.length&&gl.indexOf(r.gl)<0)return false; return true;});
  // Default view: grouped by top parent, groups ordered by most recent close date desc.
  // When a column sort is active, rows are sorted globally (flat list) so e.g. the Go-Live sort
  // gives Live first, then Delayed+ETA merged by date, then TBD. Third click on a header clears the sort.
