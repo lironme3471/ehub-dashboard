@@ -21,12 +21,14 @@ import json, os, sys, datetime, argparse
 # ---------------------------------------------------------------- overrides (Step 2 / Step 3)
 FORCE_EXCLUDE = {
     '006Ui00000nwNJNIA2', '006Hu00001V1zjUIAR', '006Ui0000279WjZIAU', '006Ui00002ITdIjIAL',
-    '006Ui00000pY77IIAS', '006Ui00002dbfJJIAY', '0063n000010m4BwAAI', '006Ui00001BopzlIAB'}
+    '006Ui00000pY77IIAS', '006Ui00002dbfJJIAY', '0063n000010m4BwAAI', '006Ui00001BopzlIAB',
+    # 2026-10-29 per Liron: for ANZ keep only 006Ui00000Ql3rVIAR (ANZ Bank | Australia | Cloud Recording Multi ACD)
+    '006i9000000aRhgAAE', '006i9000001o9HFAAY', '006i9000001pcnRAAQ', '006Ui00001IeBmfIAF'}
 FORCE_INCLUDE = [
     '006Ui00002JQIdFIAX', '006Ui00001FlFCAIA3', '006Ui00000uEyNRIA0', '006Ui00001AmVpfIAF',
     '006Hu00001XhMB1IAN', '0063n000010laAfAAI', '006Ui00001kd7Q1IAI', '006Ui000026cAebIAE',
     '006Ui00002Sw43hIAB', '006Ui00000aTVuwIAG', '006Ui00000GdYi9IAF', '006Ui00000rHB6zIAG',
-    '006Ui00001waBEMIA2', '006Ui00001IeBmfIAF', '006Ui00002Btqt5IAB', '006Ui00002KscTaIAJ',
+    '006Ui00001waBEMIA2', '006Ui00002Btqt5IAB', '006Ui00002KscTaIAJ',
     '006Ui00002XqV3lIAF', '006Ui00001kS33BIAS', '006Ui00002LBjCnIAL']
 IGNORE_LIST = {'006Ui00001OnM98IAF', '006Ui00001iARDBIA4', '006Ui00001dgksIIAQ',
                '0063n000010m4BwAAI', '006Ui00001BopzlIAB'}
@@ -101,7 +103,7 @@ OPTIONAL_FILES = ['q1carry']
 # Carry-over (2026-10-29): previously-shown deals that dropped out of Query 1 only because SF
 # Total_ACV_Value__c went to $0 (renewal netting, LastModified 2026-10-27). Kept on the dashboard
 # with live fields (q1carry.json) and flagged each run until Liron confirms force-include or removal.
-CARRY_OVER = ['006i9000001o9HFAAY', '006i9000001pcnRAAQ']  # ANZ NCCR DEV / QA renewals 2026
+CARRY_OVER = []  # ANZ NCCR DEV / QA renewals removed 2026-10-29 per Liron (now force-excluded)
 FIELDS = ['id', 'name', 'close', 'acv', 'cur', 'account', 'top', 'owner', 'region', 'agents',
           'exp_gl', 'pm_gl', 'pm_est', 'ctype', 'om', 'ttu']
 
